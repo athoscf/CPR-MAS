@@ -89,25 +89,30 @@ class CommonsGame(gym.Env):
 
     def getObservation(self):
         done = not (np.logical_or.reduce(self.state.layers['@'], axis=None))
-        ags = [self._game.things[c] for c in self.agentChars]
-        obs = []
+        agents = [self._game.things[c] for c in self.agentChars]
+        observations = []
         board = self.obToImage(self.state)['RGB'].transpose([1, 2, 0])
-        for a in ags:
-            if a.visible or a.timeout == 25:
-                if self.fullState:
-                    ob = np.copy(board)
-                    if a.visible:
-                        ob[a.position[0], a.position[1], :] = [0, 0, 255]
-                    ob = ob[self.numPadPixels:self.numPadPixels + self.mapHeight + 2,
-                         self.numPadPixels:self.numPadPixels + self.mapWidth + 2, :]
-                else:
-                    ob = np.copy(board[
-                                 a.position[0] - self.sightRadius:a.position[0] + self.sightRadius + 1,
-                                 a.position[1] - self.sightRadius:a.position[1] + self.sightRadius + 1, :])
-                    if a.visible:
-                        ob[self.sightRadius, self.sightRadius, :] = [0, 0, 255]
-                ob = ob / 255.0
+        for agent in agents:
+            observation = self.getAgentObservation(board, agent)
+            observations.append(observation)
+        return observations, done
+
+    def getAgentObservation(self, board, agent):
+        if agent.visible or agent.timeout == 25:
+            if self.fullState:
+                observation = np.copy(board)
+                if agent.visible:
+                    observation[agent.position[0], agent.position[1], :] = [0, 0, 255]
+                observation = observation[self.numPadPixels:self.numPadPixels + self.mapHeight + 2,
+                        self.numPadPixels:self.numPadPixels + self.mapWidth + 2, :]
             else:
-                ob = None
-            obs.append(ob)
-        return obs, done
+                observation = np.copy(board[
+                                agent.position[0] - self.sightRadius:agent.position[0] + self.sightRadius + 1,
+                                agent.position[1] - self.sightRadius:agent.position[1] + self.sightRadius + 1, :])
+                if agent.visible:
+                    observation[self.sightRadius, self.sightRadius, :] = [0, 0, 255]
+            observation = observation / 255.0
+        else:
+            observation = None
+        return observation
+

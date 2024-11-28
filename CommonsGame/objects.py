@@ -2,7 +2,7 @@ import numpy as np
 from pycolab.prefab_parts import sprites
 from pycolab import things as pythings
 from scipy.ndimage import convolve
-from CommonsGame.constants import respawnProbs
+from CommonsGame.constants import *
 
 
 class PlayerSprite(sprites.MazeWalker):
@@ -25,53 +25,47 @@ class PlayerSprite(sprites.MazeWalker):
                 self.timeout = 25
                 self._visible = False
             else:
-                if a == 0:  # go upward?
-                    if self.orientation == 0:
+                if a == Actions.STEP_FORWARD.value:  # go upward?
+                    if self.orientation == Orientations.NORTH.value:
                         self._north(board, the_plot)
-                    elif self.orientation == 1:
+                    elif self.orientation == Orientations.EAST.value:
                         self._east(board, the_plot)
-                    elif self.orientation == 2:
+                    elif self.orientation == Orientations.SOUTH.value:
                         self._south(board, the_plot)
-                    elif self.orientation == 3:
+                    elif self.orientation == Orientations.WEST.value:
                         self._west(board, the_plot)
-                elif a == 1:  # go downward?
-                    if self.orientation == 0:
+                elif a == Actions.STEP_BACKWARD.value:  # go downward?
+                    if self.orientation == Orientations.NORTH.value:
                         self._south(board, the_plot)
-                    elif self.orientation == 1:
+                    elif self.orientation == Orientations.EAST.value:
                         self._west(board, the_plot)
-                    elif self.orientation == 2:
+                    elif self.orientation == Orientations.SOUTH.value:
                         self._north(board, the_plot)
-                    elif self.orientation == 3:
+                    elif self.orientation == Orientations.WEST.value:
                         self._east(board, the_plot)
-                elif a == 2:  # go leftward?
-                    if self.orientation == 0:
+                elif a == Actions.STEP_LEFT.value:  # go leftward?
+                    if self.orientation == Orientations.NORTH.value:
                         self._west(board, the_plot)
-                    elif self.orientation == 1:
+                    elif self.orientation == Orientations.EAST.value:
                         self._north(board, the_plot)
-                    elif self.orientation == 2:
+                    elif self.orientation == Orientations.SOUTH.value:
                         self._east(board, the_plot)
-                    elif self.orientation == 3:
+                    elif self.orientation == Orientations.WEST.value:
                         self._south(board, the_plot)
-                elif a == 3:  # go rightward?
-                    if self.orientation == 0:
+                elif a == Actions.STEP_RIGHT.value:  # go rightward?
+                    if self.orientation == Orientations.NORTH.value:
                         self._east(board, the_plot)
-                    elif self.orientation == 1:
+                    elif self.orientation == Orientations.EAST.value:
                         self._south(board, the_plot)
-                    elif self.orientation == 2:
+                    elif self.orientation == Orientations.SOUTH.value:
                         self._west(board, the_plot)
-                    elif self.orientation == 3:
+                    elif self.orientation == Orientations.WEST.value:
                         self._north(board, the_plot)
-                elif a == 4:  # turn right?
-                    if self.orientation == 3:
-                        self.orientation = 0
-                    else:
-                        self.orientation = self.orientation + 1
-                elif a == 5:  # turn left?
-                    if self.orientation == 0:
-                        self.orientation = 3
-                    else:
-                        self.orientation = self.orientation - 1
-                elif a == 6:  # do nothing?
+                elif a == Actions.ROTATE_RIGHT.value:  # turn right?
+                    self.orientation = (self.orientation + 1) % len(Orientations)
+                elif a == Actions.ROTATE_LEFT.value:  # turn left?
+                    self.orientation = (self.orientation - 1) % len(Orientations)
+                elif a == Actions.STAND_STILL.value:  # do nothing?
                     self._stay(board, the_plot)
         else:
             if self.timeout == 0:
@@ -96,13 +90,13 @@ class SightDrape(pythings.Drape):
         for agent in ags:
             if agent.visible:
                 pos = agent.position
-                if agent.orientation == 0:
+                if agent.orientation == Orientations.NORTH.value:
                     self.curtain[pos[0] - 1, pos[1]] = True
-                elif agent.orientation == 1:
+                elif agent.orientation == Orientations.EAST.value:
                     self.curtain[pos[0], pos[1] + 1] = True
-                elif agent.orientation == 2:
+                elif agent.orientation == Orientations.SOUTH.value:
                     self.curtain[pos[0] + 1, pos[1]] = True
-                elif agent.orientation == 3:
+                elif agent.orientation == Orientations.WEST.value:
                     self.curtain[pos[0], pos[1] - 1] = True
                 self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers['=']))
 
@@ -118,16 +112,16 @@ class ShotDrape(pythings.Drape):
         self.scopeHeight = numPadPixels + 1
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
-        beamWidth = 0
-        beamHeight = self.scopeHeight
+        beamWidth = BeamDefs.WIDTH
+        beamHeight = BeamDefs.HEIGHT
         np.logical_and(self.curtain, False, self.curtain)
         if actions is not None:
             for i, a in enumerate(actions):
-                if a == 7:
+                if a == Actions.TAG.value:
                     agent = things[self.agentChars[i]]
                     if agent.visible:
                         pos = agent.position
-                        if agent.orientation == 0:
+                        if agent.orientation == Orientations.NORTH.value:
                             if np.any(layers['='][pos[0] - beamHeight:pos[0],
                                       pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamHeight:pos[0],
@@ -135,7 +129,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = beamHeight - (np.max(collisionIdxs) + 1)
                             self.curtain[pos[0] - beamHeight:pos[0],
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == 1:
+                        elif agent.orientation == Orientations.EAST.value:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
@@ -143,7 +137,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1] = True
-                        elif agent.orientation == 2:
+                        elif agent.orientation == Orientations.SOUTH.value:
                             if np.any(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
@@ -151,7 +145,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == 3:
+                        elif agent.orientation == Orientations.WEST.value:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                                       pos[1] - beamHeight:pos[1]]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
