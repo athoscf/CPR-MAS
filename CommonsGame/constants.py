@@ -13,8 +13,8 @@ bigMap = [
     list('     @ @   @@@  @ @      @ @@   @     '),
     list('      @@@   @ @  @@@      @@   @@@    '),
     list('  @    @     @@@  @             @     '),
-    list('              @                       '),
-    list('             @                        '),
+    list('              =                       '),
+    list('             =                        '),
     list('              @                       '),
     list('              @                       '),
     list('              @                       '),
@@ -32,7 +32,10 @@ smallMap = [
     list('                     '),
     list('                     ')]
 
-respawnProbs = [0.01, 0.05, 0.1]
+class RespawnProbabilities:
+    LOW = 0.01
+    MEDIUM = 0.05
+    HIGH = 0.1
 
 class Colors:
     RED = (999, 0, 0)
@@ -76,7 +79,6 @@ class BeamRange:
 class GiftRange:
     WIDTH = 2
     HEIGHT = 5
-    
     
 NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])
 NUM_ACTIONS = len([attr for attr in vars(Actions) if not attr.startswith("__")])
