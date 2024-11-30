@@ -20,7 +20,7 @@ class Beam(pythings.Drape):
         np.logical_and(self.curtain, False, self.curtain)
         
         for agent in self.tagging_agents(actions, things):
-            self.render_beam[agent.orientation](agent.position, layers, BeamDefs.WIDTH, BeamDefs.HEIGHT)
+            self.render_beam[agent.orientation](agent.position, layers, BeamRange.WIDTH, BeamRange.HEIGHT)
 
     def tagging_agents(self, actions, things):
         return [ 

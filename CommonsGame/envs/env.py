@@ -19,7 +19,7 @@ class CommonsGame(gym.Env):
         super(CommonsGame, self).__init__()
         self.fullState = fullState
         # Setup spaces
-        self.action_space = spaces.Discrete(9)
+        self.action_space = spaces.Discrete(NUM_ACTIONS)
         obHeight = obWidth = visualRadius * 2 + 1
         # Setup game
         self.numAgents = numAgents
@@ -37,13 +37,13 @@ class CommonsGame(gym.Env):
         self.state = None
         # Pycolab related setup:        
         self._game = self.buildGame()
-        colourMap = dict([(a, (999, 0, 0)) for i, a in enumerate(agentChars)]  # Agents
-                         + [(Sprites.WALL, (705, 705, 705))]  # Steel Impassable wall
-                         + [(Sprites.EMPTY, (0, 0, 0))]  # Black background
-                         + [(Sprites.APPLE, (0, 999, 0))]  # Green Apples
-                         + [(Sprites.BEAM, (750, 750, 0))]  # Yellow beam
-                         + [(Sprites.GIFT, (0, 0, 999))]  # Blue gift
-                         + [(Sprites.SCOPE, (200, 200, 200))])  # Grey scope
+        colourMap = dict([(agent, Colors.RED) for agent in agentChars]  # Agents
+                         + [(Sprites.WALL, Colors.WHITE)]  # Steel Impassable wall
+                         + [(Sprites.EMPTY, Colors.BLACK)]  # Black background
+                         + [(Sprites.APPLE, Colors.GREEN)]  # Green Apples
+                         + [(Sprites.BEAM, Colors.YELLOW)]  # Yellow beam
+                         + [(Sprites.GIFT, Colors.BLUE)]  # Blue gift
+                         + [(Sprites.SCOPE, Colors.GRAY)])  # Grey scope
         self.obToImage = ObservationToArrayWithRGB(colour_mapping=colourMap)
 
     def buildGame(self):
@@ -56,9 +56,9 @@ class CommonsGame(gym.Env):
                 [(a, ascii_art.Partial(Agent, self.agentChars)) for a in self.agentChars]),
             drapes={Sprites.APPLE: ascii_art.Partial(Apple, self.agentChars, self.numPadPixels),
                     Sprites.SCOPE: ascii_art.Partial(Scope, self.agentChars),
-                    Sprites.GIFT: ascii_art.Partial(Gift, self.agentChars, self.numPadPixels),
+                    Sprites.GIFT: ascii_art.Partial(Gift, self.agentChars),
                     Sprites.BEAM: ascii_art.Partial(Beam, self.agentChars)},
-            update_schedule=[Sprites.BEAM] + agentsOrder + [Sprites.SCOPE, Sprites.APPLE, Sprites.GIFT],
+            update_schedule=[Sprites.BEAM, Sprites.GIFT] + agentsOrder + [Sprites.SCOPE, Sprites.APPLE],
             z_order=[Sprites.SCOPE, Sprites.APPLE] + agentsOrder + [Sprites.BEAM, Sprites.GIFT]
         )
 

@@ -34,6 +34,15 @@ smallMap = [
 
 respawnProbs = [0.01, 0.05, 0.1]
 
+class Colors:
+    RED = (999, 0, 0)
+    GREEN = (0, 999, 0)
+    BLUE = (0, 0, 999)
+    YELLOW = (999, 999, 0)
+    BLACK = (0, 0, 0)
+    GRAY = (200, 200, 200)
+    WHITE = (705, 705, 705)
+
 class Actions:
     STEP_FORWARD = 0
     STEP_BACKWARD = 1
@@ -60,9 +69,13 @@ class Sprites:
     SCOPE = '-'
     EMPTY = ' '
 
-class BeamDefs:
+class BeamRange:
     WIDTH = 2
     HEIGHT = 10
+    
+class GiftRange:
+    WIDTH = 2
+    HEIGHT = 5
     
     
 NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])

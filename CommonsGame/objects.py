@@ -22,8 +22,8 @@ class ShotDrape(pythings.Drape):
         self.scopeHeight = numPadPixels + 1
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
-        beamWidth = BeamDefs.WIDTH
-        beamHeight = BeamDefs.HEIGHT
+        beamWidth = BeamRange.WIDTH
+        beamHeight = BeamRange.HEIGHT
         np.logical_and(self.curtain, False, self.curtain)
         if actions is not None:
             for i, a in enumerate(actions):
