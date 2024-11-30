@@ -16,7 +16,8 @@ class Agent(sprites.MazeWalker):
             Actions.STEP_LEFT: self.step_left,
             Actions.STEP_RIGHT: self.step_right,
             Actions.ROTATE_RIGHT: self.rotate_right,
-            Actions.ROTATE_LEFT: self.rotate_left
+            Actions.ROTATE_LEFT: self.rotate_left,
+            Actions.STAND_STILL: self.stand_still
         }
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
@@ -32,11 +33,8 @@ class Agent(sprites.MazeWalker):
         
         action = actions[self.agent_chars.index(self.character)]
         
-        if action not in self.handle_action:
-            self.stand_still(board, the_plot)
-        else:
+        if action in self.handle_action:
             self.handle_action[action](board, the_plot)
-
 
     def handle_timeout(self):
         if self.timeout == 0:
@@ -50,7 +48,7 @@ class Agent(sprites.MazeWalker):
         self._visible = False 
 
     def tagged_by_agent(self, things):
-        return things['.'].curtain[self.position[0], self.position[1]]
+        return things[Sprites.BEAM].curtain[self.position[0], self.position[1]]
 
     def step_forward(self, board, the_plot):
         if self.orientation == Orientations.NORTH:

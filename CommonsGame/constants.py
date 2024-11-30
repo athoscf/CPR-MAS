@@ -34,7 +34,6 @@ smallMap = [
 
 respawnProbs = [0.01, 0.05, 0.1]
 
-
 class Actions:
     STEP_FORWARD = 0
     STEP_BACKWARD = 1
@@ -45,7 +44,6 @@ class Actions:
     STAND_STILL = 6
     TAG = 7
     GIFT = 8
-
 
 class Orientations:
     NORTH = 0
@@ -60,6 +58,7 @@ class Sprites:
     BEAM = '.'
     GIFT = '/'
     SCOPE = '-'
+    EMPTY = ' '
 
 class BeamDefs:
     WIDTH = 2

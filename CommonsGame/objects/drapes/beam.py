@@ -4,58 +4,58 @@ from CommonsGame.constants import *
 
 class Beam(pythings.Drape):
     
-    """Tagging ray Drap"""
-    def __init__(self, curtain, character, agent_chars, num_pad_pixels):
+    def __init__(self, curtain, character, agent_chars):
         super().__init__(curtain, character)
         self.agent_chars = agent_chars
-        self.num_pad_pixels = num_pad_pixels
-        self.h = curtain.shape[0] - (num_pad_pixels * 2 + 2)
-        self.w = curtain.shape[1] - (num_pad_pixels * 2 + 2)
-        self.scope_height = num_pad_pixels + 1
-
+        self.render_beam = {
+            Orientations.NORTH: self.render_north,
+            Orientations.EAST: self.render_east,
+            Orientations.SOUTH: self.render_south,
+            Orientations.WEST: self.render_west 
+        }
+        
     def update(self, actions, board, layers, backdrop, things, the_plot):
-        beamWidth = BeamDefs.WIDTH
-        beamHeight = BeamDefs.HEIGHT
+        if actions is None: return
+        
         np.logical_and(self.curtain, False, self.curtain)
-        if actions is not None:
-            for i, a in enumerate(actions):
-                if a == Actions.TAG:
-                    agent = things[self.agent_chars[i]]
-                    if agent.visible:
-                        pos = agent.position
-                        if agent.orientation == Orientations.NORTH:
-                            if np.any(layers['='][pos[0] - beamHeight:pos[0],
-                                      pos[1] - beamWidth:pos[1] + beamWidth + 1]):
-                                collisionIdxs = np.argwhere(layers['='][pos[0] - beamHeight:pos[0],
-                                                            pos[1] - beamWidth:pos[1] + beamWidth + 1])
-                                beamHeight = beamHeight - (np.max(collisionIdxs) + 1)
-                            self.curtain[pos[0] - beamHeight:pos[0],
-                            pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.EAST:
-                            if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
-                            pos[1] + 1:pos[1] + beamHeight + 1]):
-                                collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
-                            pos[1] + 1:pos[1] + beamHeight + 1])
-                                beamHeight = np.min(collisionIdxs)
-                            self.curtain[pos[0] - beamWidth:pos[0] + beamWidth + 1,
-                            pos[1] + 1:pos[1] + beamHeight + 1] = True
-                        elif agent.orientation == Orientations.SOUTH:
-                            if np.any(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
-                            pos[1] - beamWidth:pos[1] + beamWidth + 1]):
-                                collisionIdxs = np.argwhere(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
-                            pos[1] - beamWidth:pos[1] + beamWidth + 1])
-                                beamHeight = np.min(collisionIdxs)
-                            self.curtain[pos[0] + 1:pos[0] + beamHeight + 1,
-                            pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.WEST:
-                            if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
-                                      pos[1] - beamHeight:pos[1]]):
-                                collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
-                                                            pos[1] - beamHeight:pos[1]])
-                                beamHeight = beamHeight - (np.max(collisionIdxs) + 1)
-                            self.curtain[pos[0] - beamWidth:pos[0] + beamWidth + 1, pos[1] - beamHeight:pos[1]] = True
-                        # self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers['=']))
-        else:
-            return
+        
+        for agent in self.tagging_agents(actions, things):
+            self.render_beam[agent.orientation](agent.position, layers, BeamDefs.WIDTH, BeamDefs.HEIGHT)
+
+    def tagging_agents(self, actions, things):
+        return [ 
+            things[self.agent_chars[i]] 
+            for i, a in enumerate(actions) 
+            if a == Actions.TAG and things[self.agent_chars[i]].visible
+        ]
+        
+    def render_north(self, pos, layers, width, height):
+        if np.any(layers[Sprites.WALL][pos[0] - height:pos[0], pos[1] - width:pos[1] + width + 1]):
+            collision_idxs = np.argwhere(layers[Sprites.WALL][pos[0] - height:pos[0], pos[1] - width:pos[1] + width + 1])
+            height -= (np.max(collision_idxs) + 1)
+            
+        self.curtain[pos[0] - height:pos[0], pos[1] - width:pos[1] + width + 1] = True
+        
+    def render_east(self, pos, layers, width, height):
+        if np.any(layers[Sprites.WALL][pos[0] - width:pos[0] + width + 1, pos[1] + 1:pos[1] + height + 1]):
+            collision_idxs = np.argwhere(layers[Sprites.WALL][pos[0] - width:pos[0] + width + 1, pos[1] + 1:pos[1] + height + 1])
+            height = np.min(collision_idxs)
+            
+        self.curtain[pos[0] - width:pos[0] + width + 1, pos[1] + 1:pos[1] + height + 1] = True
+        
+    def render_south(self, pos, layers, width, height):
+        if np.any(layers[Sprites.WALL][pos[0] + 1:pos[0] + height + 1, pos[1] - width:pos[1] + width + 1]):
+            collision_idxs = np.argwhere(layers[Sprites.WALL][pos[0] + 1:pos[0] + height + 1, pos[1] - width:pos[1] + width + 1])
+            height = np.min(collision_idxs)
+            
+        self.curtain[pos[0] + 1:pos[0] + height + 1, pos[1] - width:pos[1] + width + 1] = True
+        
+    def render_west(self, pos, layers, width, height):
+        if np.any(layers[Sprites.WALL][pos[0] - width:pos[0] + width + 1, pos[1] - height:pos[1]]):
+            collision_idxs = np.argwhere(layers[Sprites.WALL][pos[0] - width:pos[0] + width + 1, pos[1] - height:pos[1]])
+            height -= (np.max(collision_idxs) + 1)
+            
+        self.curtain[pos[0] - width:pos[0] + width + 1, pos[1] - height:pos[1]] = True
+        
 
 

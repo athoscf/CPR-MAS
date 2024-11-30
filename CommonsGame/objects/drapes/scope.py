@@ -20,7 +20,7 @@ class Scope(pythings.Drape):
         
         self.curtain[pos_x + off_x, pos_y + off_y] = True
         
-        self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers['=']))
+        self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers[Sprites.WALL]))
 
 
     def update(self, actions, board, layers, backdrop, things, the_plot):

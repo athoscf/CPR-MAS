@@ -9,7 +9,7 @@ from CommonsGame.utils import buildMap, ObservationToArrayWithRGB
 from CommonsGame.objects import *
 
 class CommonsGame(gym.Env):
-    """Custom Environment that follows gym interface"""
+
     metadata = {
         'render_modes': ['None', 'human'],
         'render_fps': 5    
@@ -24,7 +24,7 @@ class CommonsGame(gym.Env):
         # Setup game
         self.numAgents = numAgents
         self.sightRadius = visualRadius
-        self.agentChars = agentChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"[0:numAgents]
+        self.agentChars = agentChars = Sprites.AGENTS[0:numAgents]
         self.mapHeight = len(mapSketch)
         self.mapWidth = len(mapSketch[0])
         if fullState:
@@ -38,12 +38,12 @@ class CommonsGame(gym.Env):
         # Pycolab related setup:        
         self._game = self.buildGame()
         colourMap = dict([(a, (999, 0, 0)) for i, a in enumerate(agentChars)]  # Agents
-                         + [('=', (705, 705, 705))]  # Steel Impassable wall
-                         + [(' ', (0, 0, 0))]  # Black background
-                         + [('@', (0, 999, 0))]  # Green Apples
-                         + [('.', (750, 750, 0))]  # Yellow beam
-                         + [('/', (0, 0, 999))]  # Blue gift
-                         + [('-', (200, 200, 200))])  # Grey scope
+                         + [(Sprites.WALL, (705, 705, 705))]  # Steel Impassable wall
+                         + [(Sprites.EMPTY, (0, 0, 0))]  # Black background
+                         + [(Sprites.APPLE, (0, 999, 0))]  # Green Apples
+                         + [(Sprites.BEAM, (750, 750, 0))]  # Yellow beam
+                         + [(Sprites.GIFT, (0, 0, 999))]  # Blue gift
+                         + [(Sprites.SCOPE, (200, 200, 200))])  # Grey scope
         self.obToImage = ObservationToArrayWithRGB(colour_mapping=colourMap)
 
     def buildGame(self):
@@ -54,13 +54,12 @@ class CommonsGame(gym.Env):
             what_lies_beneath=' ',
             sprites=dict(
                 [(a, ascii_art.Partial(Agent, self.agentChars)) for a in self.agentChars]),
-            drapes={'@': ascii_art.Partial(Apple, self.agentChars, self.numPadPixels),
-                    '-': ascii_art.Partial(Scope, self.agentChars),
-                    '/': ascii_art.Partial(Gift, self.agentChars, self.numPadPixels),
-                    '.': ascii_art.Partial(Beam, self.agentChars, self.numPadPixels)},
-            # update_schedule=['.'] + agentsOrder + ['-'] + ['@'],
-            update_schedule=['.'] + agentsOrder + ['-'] + ['@'] + ['/'],
-            z_order=['-'] + ['@'] + agentsOrder + ['.'] + ['/']
+            drapes={Sprites.APPLE: ascii_art.Partial(Apple, self.agentChars, self.numPadPixels),
+                    Sprites.SCOPE: ascii_art.Partial(Scope, self.agentChars),
+                    Sprites.GIFT: ascii_art.Partial(Gift, self.agentChars, self.numPadPixels),
+                    Sprites.BEAM: ascii_art.Partial(Beam, self.agentChars)},
+            update_schedule=[Sprites.BEAM] + agentsOrder + [Sprites.SCOPE, Sprites.APPLE, Sprites.GIFT],
+            z_order=[Sprites.SCOPE, Sprites.APPLE] + agentsOrder + [Sprites.BEAM, Sprites.GIFT]
         )
 
     def step(self, nActions):
