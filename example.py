@@ -1,5 +1,8 @@
 import numpy as np
 import gym
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 numAgents = 11
 

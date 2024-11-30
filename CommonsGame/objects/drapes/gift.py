@@ -1,17 +1,9 @@
 import numpy as np
 from pycolab.prefab_parts import sprites
 from pycolab import things as pythings
-from scipy.ndimage import convolve
 from CommonsGame.constants import *
 
-
-
-
-
-                
-
-
-class ShotDrape(pythings.Drape):
+class Gift(pythings.Drape):
     """Tagging ray Drap"""
     def __init__(self, curtain, character, agentChars, numPadPixels):
         super().__init__(curtain, character)
@@ -27,11 +19,11 @@ class ShotDrape(pythings.Drape):
         np.logical_and(self.curtain, False, self.curtain)
         if actions is not None:
             for i, a in enumerate(actions):
-                if a == Actions.TAG.value:
+                if a == Actions.GIFT:
                     agent = things[self.agentChars[i]]
                     if agent.visible:
                         pos = agent.position
-                        if agent.orientation == Orientations.NORTH.value:
+                        if agent.orientation == Orientations.NORTH:
                             if np.any(layers['='][pos[0] - beamHeight:pos[0],
                                       pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamHeight:pos[0],
@@ -39,7 +31,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = beamHeight - (np.max(collisionIdxs) + 1)
                             self.curtain[pos[0] - beamHeight:pos[0],
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.EAST.value:
+                        elif agent.orientation == Orientations.EAST:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
@@ -47,7 +39,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1] = True
-                        elif agent.orientation == Orientations.SOUTH.value:
+                        elif agent.orientation == Orientations.SOUTH:
                             if np.any(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
@@ -55,7 +47,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.WEST.value:
+                        elif agent.orientation == Orientations.WEST:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                                       pos[1] - beamHeight:pos[1]]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
@@ -65,5 +57,3 @@ class ShotDrape(pythings.Drape):
                         # self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers['=']))
         else:
             return
-
-

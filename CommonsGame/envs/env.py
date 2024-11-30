@@ -1,5 +1,4 @@
 import random
-
 import numpy as np
 import matplotlib.pyplot as plt
 import gym
@@ -7,18 +6,20 @@ from gym import spaces
 from pycolab import ascii_art
 from CommonsGame.constants import *
 from CommonsGame.utils import buildMap, ObservationToArrayWithRGB
-from CommonsGame.objects import PlayerSprite, AppleDrape, SightDrape, ShotDrape
-
+from CommonsGame.objects import *
 
 class CommonsGame(gym.Env):
     """Custom Environment that follows gym interface"""
-    metadata = {'render.modes': ['human']}
+    metadata = {
+        'render_modes': ['None', 'human'],
+        'render_fps': 5    
+    }
 
     def __init__(self, numAgents, visualRadius, mapSketch=bigMap, fullState=False):
         super(CommonsGame, self).__init__()
         self.fullState = fullState
         # Setup spaces
-        self.action_space = spaces.Discrete(8)
+        self.action_space = spaces.Discrete(9)
         obHeight = obWidth = visualRadius * 2 + 1
         # Setup game
         self.numAgents = numAgents
@@ -41,6 +42,7 @@ class CommonsGame(gym.Env):
                          + [(' ', (0, 0, 0))]  # Black background
                          + [('@', (0, 999, 0))]  # Green Apples
                          + [('.', (750, 750, 0))]  # Yellow beam
+                         + [('/', (0, 0, 999))]  # Blue gift
                          + [('-', (200, 200, 200))])  # Grey scope
         self.obToImage = ObservationToArrayWithRGB(colour_mapping=colourMap)
 
@@ -51,13 +53,14 @@ class CommonsGame(gym.Env):
             self.gameField,
             what_lies_beneath=' ',
             sprites=dict(
-                [(a, ascii_art.Partial(PlayerSprite, self.agentChars)) for a in self.agentChars]),
-            drapes={'@': ascii_art.Partial(AppleDrape, self.agentChars, self.numPadPixels),
-                    '-': ascii_art.Partial(SightDrape, self.agentChars, self.numPadPixels),
-                    '.': ascii_art.Partial(ShotDrape, self.agentChars, self.numPadPixels)},
+                [(a, ascii_art.Partial(Agent, self.agentChars)) for a in self.agentChars]),
+            drapes={'@': ascii_art.Partial(Apple, self.agentChars, self.numPadPixels),
+                    '-': ascii_art.Partial(Sight, self.agentChars, self.numPadPixels),
+                    '/': ascii_art.Partial(Gift, self.agentChars, self.numPadPixels),
+                    '.': ascii_art.Partial(Tag, self.agentChars, self.numPadPixels)},
             # update_schedule=['.'] + agentsOrder + ['-'] + ['@'],
-            update_schedule=['.'] + agentsOrder + ['-'] + ['@'],
-            z_order=['-'] + ['@'] + agentsOrder + ['.']
+            update_schedule=['.'] + agentsOrder + ['-'] + ['@'] + ['/'],
+            z_order=['-'] + ['@'] + agentsOrder + ['.'] + ['/']
         )
 
     def step(self, nActions):

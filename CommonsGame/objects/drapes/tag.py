@@ -1,25 +1,17 @@
 import numpy as np
-from pycolab.prefab_parts import sprites
 from pycolab import things as pythings
-from scipy.ndimage import convolve
 from CommonsGame.constants import *
 
-
-
-
-
-                
-
-
-class ShotDrape(pythings.Drape):
+class Tag(pythings.Drape):
+    
     """Tagging ray Drap"""
-    def __init__(self, curtain, character, agentChars, numPadPixels):
+    def __init__(self, curtain, character, agent_chars, num_pad_pixels):
         super().__init__(curtain, character)
-        self.agentChars = agentChars
-        self.numPadPixels = numPadPixels
-        self.h = curtain.shape[0] - (numPadPixels * 2 + 2)
-        self.w = curtain.shape[1] - (numPadPixels * 2 + 2)
-        self.scopeHeight = numPadPixels + 1
+        self.agent_chars = agent_chars
+        self.num_pad_pixels = num_pad_pixels
+        self.h = curtain.shape[0] - (num_pad_pixels * 2 + 2)
+        self.w = curtain.shape[1] - (num_pad_pixels * 2 + 2)
+        self.scope_height = num_pad_pixels + 1
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
         beamWidth = BeamDefs.WIDTH
@@ -27,11 +19,11 @@ class ShotDrape(pythings.Drape):
         np.logical_and(self.curtain, False, self.curtain)
         if actions is not None:
             for i, a in enumerate(actions):
-                if a == Actions.TAG.value:
-                    agent = things[self.agentChars[i]]
+                if a == Actions.TAG:
+                    agent = things[self.agent_chars[i]]
                     if agent.visible:
                         pos = agent.position
-                        if agent.orientation == Orientations.NORTH.value:
+                        if agent.orientation == Orientations.NORTH:
                             if np.any(layers['='][pos[0] - beamHeight:pos[0],
                                       pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamHeight:pos[0],
@@ -39,7 +31,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = beamHeight - (np.max(collisionIdxs) + 1)
                             self.curtain[pos[0] - beamHeight:pos[0],
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.EAST.value:
+                        elif agent.orientation == Orientations.EAST:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
@@ -47,7 +39,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] - beamWidth:pos[0] + beamWidth + 1,
                             pos[1] + 1:pos[1] + beamHeight + 1] = True
-                        elif agent.orientation == Orientations.SOUTH.value:
+                        elif agent.orientation == Orientations.SOUTH:
                             if np.any(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] + 1:pos[0] + beamHeight + 1,
@@ -55,7 +47,7 @@ class ShotDrape(pythings.Drape):
                                 beamHeight = np.min(collisionIdxs)
                             self.curtain[pos[0] + 1:pos[0] + beamHeight + 1,
                             pos[1] - beamWidth:pos[1] + beamWidth + 1] = True
-                        elif agent.orientation == Orientations.WEST.value:
+                        elif agent.orientation == Orientations.WEST:
                             if np.any(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
                                       pos[1] - beamHeight:pos[1]]):
                                 collisionIdxs = np.argwhere(layers['='][pos[0] - beamWidth:pos[0] + beamWidth + 1,
