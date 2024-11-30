@@ -55,9 +55,9 @@ class CommonsGame(gym.Env):
             sprites=dict(
                 [(a, ascii_art.Partial(Agent, self.agentChars)) for a in self.agentChars]),
             drapes={'@': ascii_art.Partial(Apple, self.agentChars, self.numPadPixels),
-                    '-': ascii_art.Partial(Sight, self.agentChars, self.numPadPixels),
+                    '-': ascii_art.Partial(Scope, self.agentChars),
                     '/': ascii_art.Partial(Gift, self.agentChars, self.numPadPixels),
-                    '.': ascii_art.Partial(Tag, self.agentChars, self.numPadPixels)},
+                    '.': ascii_art.Partial(Beam, self.agentChars, self.numPadPixels)},
             # update_schedule=['.'] + agentsOrder + ['-'] + ['@'],
             update_schedule=['.'] + agentsOrder + ['-'] + ['@'] + ['/'],
             z_order=['-'] + ['@'] + agentsOrder + ['.'] + ['/']

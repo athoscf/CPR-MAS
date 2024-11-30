@@ -46,7 +46,6 @@ class Actions:
     TAG = 7
     GIFT = 8
 
-NUM_ACTIONS = len([attr for attr in vars(Actions) if not attr.startswith("__")])
 
 class Orientations:
     NORTH = 0
@@ -54,8 +53,18 @@ class Orientations:
     SOUTH = 2
     WEST = 3
     
-NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])
-    
+class Sprites:
+    WALL = '='
+    APPLE = '@'
+    AGENTS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    BEAM = '.'
+    GIFT = '/'
+    SCOPE = '-'
+
 class BeamDefs:
     WIDTH = 2
     HEIGHT = 10
+    
+    
+NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])
+NUM_ACTIONS = len([attr for attr in vars(Actions) if not attr.startswith("__")])

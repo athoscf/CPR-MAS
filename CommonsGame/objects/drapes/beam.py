@@ -2,7 +2,7 @@ import numpy as np
 from pycolab import things as pythings
 from CommonsGame.constants import *
 
-class Tag(pythings.Drape):
+class Beam(pythings.Drape):
     
     """Tagging ray Drap"""
     def __init__(self, curtain, character, agent_chars, num_pad_pixels):
