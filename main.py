@@ -20,7 +20,9 @@ def state_to_index(state):
     """Convert observation (state) to a hashable index."""
     if state is None:
         return -1  # Handle None state
-    return hash(str(state)) % 10000  # Simplified; modify if needed for large state spaces
+    #return hash(state) % 10000  # Simplified; modify if needed for large state spaces
+    # print the type of state
+    return hash((state)) % 10000
 
 def select_action(agent_id, observation):
     """Select an action using epsilon-greedy policy."""
@@ -75,7 +77,7 @@ for episode in range(num_episodes):
             update_q_table(agent_id, observations[agent_id], nActions[agent_id],
                            nRewards[agent_id], nObservations[agent_id])
 
-        if episode == 50 :
+        if episode % 50 == 0:
             env.render()
 
     # Optionally: print statistics or progress per episode

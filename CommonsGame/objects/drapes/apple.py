@@ -35,14 +35,12 @@ class Apple(pythings.Drape):
         return available_cells
 
     def calculate_rewards(self, things):
-        rewards = []
+        rewards = [0 for i in self.agent_chars]
         for agent in [things[c] for c in self.agent_chars if things[c].visible]:
             if self.collected_apple(agent.position):
                 agent.reward += 1
-                rewards.append(1)
+                rewards[agent.index] += 1
                 self.remove_apple(agent.position)
-            else:
-                rewards.append(0)
         return rewards
         
     def respawn_apples(self, available_cells, layers):

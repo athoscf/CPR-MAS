@@ -79,7 +79,7 @@ class CommonsGame(gym.Env):
         return observations, done
 
     def get_agent_observation(self, board, agent):
-        if not agent.visible and agent.timeout != TIMEOUT: return None
+        if not agent.visible and agent.timeout != TIMEOUT: return 'None'
        
         if self.full_state:
             observation = np.copy(board)
@@ -91,5 +91,5 @@ class CommonsGame(gym.Env):
                             agent.position[0] - self.sight_radius:agent.position[0] + self.sight_radius + 1,
                             agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
             observation[self.sight_radius, self.sight_radius, :] = Colours.PURPLE
-
-        return rbg_to_char(observation)
+        
+        return observation.tobytes()
