@@ -61,14 +61,17 @@ def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
     metrics_history['S'].append(S)
     metrics_history['P'].append(P)
 
-    return 
+    return U,E,S,P
 # Main loop
 done = False
 
 num_episodes = 1000
 
 metrics_history = {'U': [], 'E': [], 'S': [], 'P': []}
-
+U = 0
+E = 0
+S = 0
+P = 0
 for episode in range(num_episodes):
     done = False
     env.reset()
@@ -106,11 +109,12 @@ for episode in range(num_episodes):
                 reward_times[agent_id].append(t)
 
         tagged_steps += nActions.count(7)
-        total_steps += numAgents  # Increment by the number of agents acting at each step
+        total_steps += numAgents
 
         if episode == 500:
             env.render()
-    
+
+    U,E,S,P = calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps)
 
     if episode % 100 == 0:
         print(f"Episode {episode + 1}: U={U:.2f}, E={E:.2f}, S={S:.2f}, P={P:.2f}")
