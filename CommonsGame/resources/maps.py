@@ -111,3 +111,28 @@ class MultipleEntranceMap:
         list(' @@@  @@@  @@@  @@@  @@@=    @@@  @@@  @@@  @@@  @@@ '),
         list('  @    @    @    @    @ =   = @    @    @    @    @  '),
     ]
+    
+class RegionMap:
+    num_agents = 12
+    agent_chars = "ABCDEFGHIJKL"
+    map = [
+        list('  @    @    @    @    @       @    @    @    @    @  '),
+        list(' @@@  @@@  @@@  @@@  @@@     @@@  @@@  @@@  @@@  @@@ '),
+        list('  @    @    @    @    @       @    @    @    @    @  '),
+        list('                                                     '),
+        list('     @    @    @    @           @    @    @    @     '),
+        list('    @@@  @@@  @@@  @@@         @@@  @@@  @@@  @@@    '),
+        list('     @    @    @    @           @    @    @    @     '),
+        list('                                                     '),
+        list('       C       E                G     I   J          '),
+        list('   A        D                      H             B   '),
+        list('                 F                     L    K        '),
+        list('                                                     '),
+        list('     @    @    @    @           @    @    @    @     '),
+        list('    @@@  @@@  @@@  @@@         @@@  @@@  @@@  @@@    '),
+        list('     @    @    @    @           @    @    @    @     '),
+        list('                                                     '),
+        list('  @    @    @    @    @       @    @    @    @    @  '),
+        list(' @@@  @@@  @@@  @@@  @@@     @@@  @@@  @@@  @@@  @@@ '),
+        list('  @    @    @    @    @       @    @    @    @    @  '),
+    ]
