@@ -37,7 +37,7 @@ class OpenMap:
         list('             @                  H  I    '),
     ]
     
-class BasicSingleEntranceMap:
+class SingleEntranceMap:
     num_agents = 12
     agent_chars = "ABCDEFGHIJKL"
     map = [
@@ -52,6 +52,31 @@ class BasicSingleEntranceMap:
         list('       C       E                G     I   J          '),
         list('  A         D                      H             L   '),
         list('    B            F                          K        '),
+        list('=========================   = ======================='),
+        list('     @    @    @    @       = = @    @    @    @     '),
+        list('    @@@  @@@  @@@  @@@===   = =@@@  @@@  @@@  @@@    '),
+        list('     @    @    @    @   =   =   @    @    @    @     '),
+        list('                        =   =                        '),
+        list('  @    @    @    @    @ =   = @    @    @    @    @  '),
+        list(' @@@  @@@  @@@  @@@  @@@=   =@@@  @@@  @@@  @@@  @@@ '),
+        list('  @    @    @    @    @ =   = @    @    @    @    @  '),
+    ]
+    
+class UnequalEntranceMap:
+    num_agents = 12
+    agent_chars = "ABCDEFGHIJKL"
+    map = [
+        list('  @   @   @   @   @     =   = @    @    @    @    @  '),
+        list(' @@@ @@@ @@@ @@@ @@@    =   =@@@  @@@  @@@  @@@  @@@ '),
+        list('  @ @ @ @ @ @ @ @ @     =   = @    @    @    @    @  '),
+        list('   @@@ @@@ @@@ @@@      =   =                        '),
+        list('    @   @   @   @       =   =   @    @    @    @     '),
+        list('                      = =   ===@@@  @@@  @@@  @@@    '),
+        list('                      = =       @    @    @    @     '),
+        list('======================= =   ========================='),
+        list('       C       F                      I   J          '),
+        list('  A     D   E                      H             L   '),
+        list('    B            G                          K        '),
         list('=========================   = ======================='),
         list('     @    @    @    @       = = @    @    @    @     '),
         list('    @@@  @@@  @@@  @@@===   = =@@@  @@@  @@@  @@@    '),

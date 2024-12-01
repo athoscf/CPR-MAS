@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 numAgents = 1
 
-env = gym.make('CommonsGame:CommonsGame-v0', map_config=BasicSingleEntranceMap, visual_radius=4)
+env = gym.make('CommonsGame:CommonsGame-v0', map_config=UnequalEntranceMap, visual_radius=4)
 env.reset()\
     
     
