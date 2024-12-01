@@ -47,6 +47,17 @@ def build_game(map_sketch, num_pad_pixels, agent_chars):
         z_order=[Sprites.SCOPE, Sprites.APPLE] + agentsOrder + [Sprites.BEAM, Sprites.GIFT]
     )
 
+def rbg_to_char(observation):
+    char_observation = []
+    for row in observation:
+        char_row = []
+        for pixel in row:
+            rgb_tuple = tuple(pixel)  
+            char_row.append(COLOUR_TO_CHAR.get(rgb_tuple, ' ')) 
+        char_observation.append(char_row)
+
+    return char_observation
+
 class ObservationToArrayWithRGB(object):
     def __init__(self, agent_chars):
         colour_mapping = dict([(agent, Colours.RED) for agent in agent_chars] + DEFAULT_COLOURS)

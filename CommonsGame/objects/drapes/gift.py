@@ -16,6 +16,7 @@ class Gift(pythings.Drape):
         
     def update(self, actions, board, layers, backdrop, things, the_plot):
         if actions is None: return
+        
         np.logical_and(self.curtain, False, self.curtain)
         
         rewards = [0 for i in range(len(self.agent_chars))]
@@ -26,7 +27,7 @@ class Gift(pythings.Drape):
             
             gifted_agents = self.gifted_agents(agent.position, x_min, x_max, y_min, y_max, things)
             if len(gifted_agents) > 0:
-                tmp_rewards = self.gift_agents(agent, gifted_agents, the_plot)
+                tmp_rewards = self.gift_agents(agent, gifted_agents)
                 rewards = [r + tr for r, tr in zip(rewards, tmp_rewards)]
                 
         the_plot.add_reward(rewards)
@@ -50,8 +51,7 @@ class Gift(pythings.Drape):
 
         return gifted_agents
         
-    def gift_agents(self, gifting_agent, gifted_agents, the_plot):
-        
+    def gift_agents(self, gifting_agent, gifted_agents):
         rewards = [0 for i in range(len(self.agent_chars))]
         gift_weight = 1 / len(gifted_agents)
         
@@ -63,7 +63,6 @@ class Gift(pythings.Drape):
             rewards[agent.index] += gift_weight
         
         return rewards
-        
         
     def render_north(self, pos, layers, width, height):
         if np.any(layers[Sprites.WALL][pos[0] - height:pos[0], pos[1] - width:pos[1] + width + 1]):

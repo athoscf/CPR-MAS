@@ -12,19 +12,14 @@ class Apple(pythings.Drape):
         self.apples = np.copy(curtain)
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
-        rewards = self.calculate_rewards(things)
+        if actions is None: return
         
-        if the_plot._engine_directives.summed_reward is None:
-            the_plot.add_reward(rewards)
-        else:
-            the_plot._engine_directives.summed_reward = [r + sr for r, sr in zip(rewards, the_plot._engine_directives.summed_reward)]
+        rewards = self.calculate_rewards(things)
+        the_plot._engine_directives.summed_reward = [r + sr for r, sr in zip(rewards, the_plot._engine_directives.summed_reward)]
 
         available_cells = self.available_cells(things)
         self.respawn_apples(available_cells, layers)
 
-    def agents(self, things):
-        return [things[agent] for agent in self.agent_chars]
-        
     def collected_apple(self, position):
         return self.curtain[position[0], position[1]]
 
@@ -34,14 +29,14 @@ class Apple(pythings.Drape):
     def available_cells(self, things):
         available_cells = np.ones(self.curtain.shape, dtype=bool)
 
-        for agent in self.agents(things):
+        for agent in [things[c] for c in self.agent_chars if things[c].visible]:
             available_cells[agent.position[0], agent.position[1]] = False
 
         return available_cells
 
     def calculate_rewards(self, things):
         rewards = []
-        for agent in self.agents(things):
+        for agent in [things[c] for c in self.agent_chars if things[c].visible]:
             if self.collected_apple(agent.position):
                 agent.reward += 1
                 rewards.append(1)

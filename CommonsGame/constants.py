@@ -68,9 +68,10 @@ class Sprites:
     APPLE = '@'
     AGENTS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     BEAM = '.'
-    GIFT = '/'
+    GIFT = '$'
     SCOPE = '-'
     EMPTY = ' '
+    AGENT = '%'
 
 class BeamRange:
     WIDTH = 2
@@ -88,6 +89,16 @@ DEFAULT_COLOURS = [
     (Sprites.SCOPE, Colours.GRAY),
     (Sprites.EMPTY, Colours.BLACK)
 ]
+
+COLOUR_TO_CHAR = {
+    tuple(Colours.RED): Sprites.AGENT,
+    tuple(Colours.GREEN): Sprites.APPLE,
+    tuple(Colours.BLUE): Sprites.GIFT,
+    tuple(Colours.YELLOW): Sprites.BEAM,
+    tuple(Colours.GRAY): Sprites.SCOPE,
+    tuple(Colours.BLACK): Sprites.EMPTY,
+    tuple(Colours.WHITE): Sprites.WALL
+}
     
 TIMEOUT = 25
 NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])

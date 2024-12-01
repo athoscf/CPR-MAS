@@ -14,6 +14,14 @@ class Scope(pythings.Drape):
             Orientations.WEST: (0, -1)
         }
 
+    def update(self, actions, board, layers, backdrop, things, the_plot):
+        if actions is None: return
+        
+        np.logical_and(self.curtain, False, self.curtain)
+        agents = [things[c] for c in self.agent_chars if things[c].visible]
+        for agent in agents:
+            self.render_scope(agent, layers)
+
     def render_scope(self, agent, layers):
         pos_x, pos_y = agent.position
         off_x, off_y = self.scope_offset[agent.orientation]
@@ -22,11 +30,4 @@ class Scope(pythings.Drape):
         
         self.curtain[:, :] = np.logical_and(self.curtain, np.logical_not(layers[Sprites.WALL]))
 
-
-    def update(self, actions, board, layers, backdrop, things, the_plot):
-        np.logical_and(self.curtain, False, self.curtain)
-        agents = [things[c] for c in self.agent_chars]
-        for agent in agents:
-            if agent.visible:
-                self.render_scope(agent, layers)
                 

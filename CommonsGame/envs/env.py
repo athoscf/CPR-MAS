@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import gym
 from gym import spaces
 from CommonsGame.constants import *
-from CommonsGame.utils import build_game, ObservationToArrayWithRGB
+from CommonsGame.utils import *
 from CommonsGame.objects import *
 
 class CommonsGame(gym.Env):
@@ -92,4 +92,4 @@ class CommonsGame(gym.Env):
                             agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
             observation[self.sight_radius, self.sight_radius, :] = Colours.RED
 
-        return observation
+        return rbg_to_char(observation)
