@@ -56,7 +56,9 @@ def rbg_to_char(observation):
             char_row.append(COLOUR_TO_CHAR.get(rgb_tuple, ' ')) 
         char_observation.append(char_row)
 
-    return char_observation
+    char_observation = np.array(char_observation)
+
+    return char_observation.tostring()
 
 class ObservationToArrayWithRGB(object):
     def __init__(self, agent_chars):

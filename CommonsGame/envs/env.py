@@ -91,5 +91,5 @@ class CommonsGame(gym.Env):
                             agent.position[0] - self.sight_radius:agent.position[0] + self.sight_radius + 1,
                             agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
             observation[self.sight_radius, self.sight_radius, :] = Colours.PURPLE
-
-        return observation.tostring()
+        
+        return observation.tobytes()
