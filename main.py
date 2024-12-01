@@ -45,7 +45,7 @@ def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
     total_rewards = np.sum(episode_rewards)
 
     if total_rewards > 0:
-        pairwise_diff_sum = sum(abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:]) * 2 
+        pairwise_diff_sum = sum(abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:])
         E = 1 - (pairwise_diff_sum / (2 * numAgents * total_rewards))
     else:
         E = 0
