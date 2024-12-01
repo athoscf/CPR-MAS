@@ -10,6 +10,7 @@ class Agent(sprites.MazeWalker):
         self.orientation = np.random.choice(NUM_ORIENTATIONS)
         self.init_pos = position
         self.timeout = 0
+        self.reward = 0
         self.handle_action = {
             Actions.STEP_FORWARD: self.step_forward,
             Actions.STEP_BACKWARD: self.step_backward,
@@ -44,7 +45,7 @@ class Agent(sprites.MazeWalker):
             self.timeout -= 1
 
     def remove_from_board(self):
-        self.timeout = 25
+        self.timeout = TIMEOUT
         self._visible = False 
 
     def tagged_by_agent(self, things):
@@ -98,3 +99,4 @@ class Agent(sprites.MazeWalker):
 
     def stand_still(self, board, the_plot):
         self._stay(board, the_plot)
+    

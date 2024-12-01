@@ -1,14 +1,17 @@
 import numpy as np
 import gym
 import warnings
-
+from CommonsGame.constants import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-numAgents = 11
+numAgents = 2
 
-env = gym.make('CommonsGame:CommonsGame-v0', numAgents=numAgents, visualRadius=4)
+env = gym.make('CommonsGame:CommonsGame-v0', num_agents=numAgents, visual_radius=5, map_sketch=small_map)
 env.reset()
-for t in range(50):
-    nActions = np.random.randint(low=0, high=env.action_space.n, size=(numAgents,)).tolist()
+for t in range(100):
+    nActions = [7, 7]
     nObservations, nRewards, nDone, nInfo = env.step(nActions)
+    if (t == 99):
+        print(nObservations)
     env.render()
+

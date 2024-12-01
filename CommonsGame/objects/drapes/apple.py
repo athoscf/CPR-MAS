@@ -13,7 +13,12 @@ class Apple(pythings.Drape):
 
     def update(self, actions, board, layers, backdrop, things, the_plot):
         rewards = self.calculate_rewards(things)
-        the_plot.add_reward(rewards)
+        
+        if the_plot._engine_directives.summed_reward is None:
+            the_plot.add_reward(rewards)
+        else:
+            the_plot._engine_directives.summed_reward = [r + sr for r, sr in zip(rewards, the_plot._engine_directives.summed_reward)]
+        print(the_plot._engine_directives.summed_reward)
 
         available_cells = self.available_cells(things)
         self.respawn_apples(available_cells, layers)
@@ -39,6 +44,7 @@ class Apple(pythings.Drape):
         rewards = []
         for agent in self.agents(things):
             if self.collected_apple(agent.position):
+                agent.reward += 1
                 rewards.append(1)
                 self.remove_apple(agent.position)
             else:

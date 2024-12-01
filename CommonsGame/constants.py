@@ -1,4 +1,4 @@
-bigMap = [
+big_map = [
     list('                                      '),
     list('             @      @@@@@       @     '),
     list('         @   @@         @@@    @  @   '),
@@ -22,12 +22,12 @@ bigMap = [
     list('              @                       '),
 ]
 
-smallMap = [
+small_map = [
     list('                     '),
-    list('           =         '),
-    list('          ===        '),
-    list('         ===         '),
-    list('          =          '),
+    list('           @         '),
+    list('          @@@        '),
+    list('         @@@         '),
+    list('          @          '),
     list('                     '),
     list('                     '),
     list('                     ')]
@@ -37,14 +37,14 @@ class RespawnProbabilities:
     MEDIUM = 0.05
     HIGH = 0.1
 
-class Colors:
-    RED = (999, 0, 0)
-    GREEN = (0, 999, 0)
-    BLUE = (0, 0, 999)
-    YELLOW = (999, 999, 0)
-    BLACK = (0, 0, 0)
-    GRAY = (200, 200, 200)
-    WHITE = (705, 705, 705)
+class Colours:
+    RED = [255, 0, 0]
+    GREEN = [0, 255, 0]
+    BLUE = [0, 0, 255]
+    YELLOW = [255, 255, 0]
+    BLACK = [0, 0, 0]
+    GRAY = [52, 52, 52]
+    WHITE = [180, 180, 180]
 
 class Actions:
     STEP_FORWARD = 0
@@ -80,5 +80,15 @@ class GiftRange:
     WIDTH = 2
     HEIGHT = 5
     
+DEFAULT_COLOURS = [
+    (Sprites.WALL, Colours.WHITE),
+    (Sprites.APPLE, Colours.GREEN),
+    (Sprites.BEAM, Colours.YELLOW),
+    (Sprites.GIFT, Colours.BLUE),
+    (Sprites.SCOPE, Colours.GRAY),
+    (Sprites.EMPTY, Colours.BLACK)
+]
+    
+TIMEOUT = 25
 NUM_ORIENTATIONS = len([attr for attr in vars(Orientations) if not attr.startswith("__")])
 NUM_ACTIONS = len([attr for attr in vars(Actions) if not attr.startswith("__")])
