@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 import random
-from CommonsGame.constants import smallMap
+from CommonsGame.constants import *
 
 # Parameters
 numAgents = 4
@@ -10,9 +10,9 @@ alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
 
 # Environment setup
-env = gym.make('CommonsGame:CommonsGame-v0', numAgents=numAgents, visualRadius=2, mapSketch=smallMap, fullState=True)
+env = gym.make('CommonsGame:CommonsGame-v0', num_agents=numAgents, visual_radius=2, map_sketch=small_map, full_state=True)
 action_space = env.action_space.n
-obs_space_shape = (env.mapHeight + 2 * env.numPadPixels, env.mapWidth + 2 * env.numPadPixels, 3)  # Based on provided `getObservation` logic
+obs_space_shape = (env.map_height + 2 * env.num_pad_pixels, env.map_width + 2 * env.num_pad_pixels, 3)  # Based on provided `getObservation` logic
 Q_tables = [np.zeros((10000, action_space)) for _ in range(numAgents)]  # Replace 10000 with an appropriate state space size
 
 # Helper functions
@@ -20,7 +20,7 @@ def state_to_index(state):
     """Convert observation (state) to a hashable index."""
     if state is None:
         return -1  # Handle None state
-    return hash(state.tostring()) % 10000  # Simplified; modify if needed for large state spaces
+    return hash(str(state)) % 10000  # Simplified; modify if needed for large state spaces
 
 def select_action(agent_id, observation):
     """Select an action using epsilon-greedy policy."""
@@ -83,7 +83,10 @@ for episode in range(num_episodes):
             break
 
         # Get observations for all agents
-        observations, done = env.getObservation()
+        observations, done = env.get_observation()
+
+        #if episode == 10:  # Example: Print observation of the first agent during episode 10
+        #    print(observations[0])
 
         nActions = []
 
