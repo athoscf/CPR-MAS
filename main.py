@@ -4,7 +4,7 @@ import random
 from CommonsGame.constants import smallMap
 
 # Parameters
-numAgents = 1
+numAgents = 4
 epsilon = 0.1  # Exploration rate
 alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
@@ -40,14 +40,43 @@ def update_q_table(agent_id, obs, action, reward, next_obs):
     td_error = td_target - Q_tables[agent_id][state_idx][action]
     Q_tables[agent_id][state_idx][action] += alpha * td_error
 
+def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
+    # Calculate metrics after the episode
+    U = np.mean(episode_rewards)  
+    total_rewards = np.sum(episode_rewards)
+
+    if total_rewards > 0:
+        # Compute pairwise differences without building a full matrix
+        pairwise_diff_sum = sum(
+            abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:]
+        ) * 2  # Multiply by 2 since we only consider half of the pairs
+        E = 1 - (pairwise_diff_sum / (2 * numAgents * total_rewards))
+    else:
+        E = 0
+    S = np.mean([np.mean(times) if times else 0 for times in reward_times])
+    P = (total_steps - tagged_steps) / total_steps if total_steps > 0 else 0  
+
+    metrics_history['U'].append(U)
+    metrics_history['E'].append(E)
+    metrics_history['S'].append(S)
+    metrics_history['P'].append(P)
+
+    return 
 # Main loop
 done = False
 
 num_episodes = 1000
 
+metrics_history = {'U': [], 'E': [], 'S': [], 'P': []}
+
 for episode in range(num_episodes):
     done = False
     env.reset()
+
+    episode_rewards = np.zeros(numAgents) 
+    reward_times = [[] for _ in range(numAgents)] 
+    tagged_steps = 0 
+    total_steps = 0  
 
     # For each episode, run until done
     for t in range(1000):  # You can also set a maximum number of time steps per episode if desired
@@ -56,9 +85,6 @@ for episode in range(num_episodes):
 
         # Get observations for all agents
         observations, done = env.getObservation()
-
-        #if episode == 10:  # Example: Print observation of the first agent during episode 10
-        #    print(observations[0])
 
         nActions = []
 
@@ -75,10 +101,23 @@ for episode in range(num_episodes):
             update_q_table(agent_id, observations[agent_id], nActions[agent_id],
                            nRewards[agent_id], nObservations[agent_id])
 
-        if episode == 500 :
-            env.render()
+            episode_rewards[agent_id] += nRewards[agent_id]
+            if nRewards[agent_id] > 0:
+                reward_times[agent_id].append(t)
 
-    # Optionally: print statistics or progress per episode
+        tagged_steps += nActions.count(7)
+        total_steps += numAgents  # Increment by the number of agents acting at each step
+
+        if episode == 500:
+            env.render()
+    
+
     if episode % 100 == 0:
-        print(f"Episode {episode + 1} completed")
+        print(f"Episode {episode + 1}: U={U:.2f}, E={E:.2f}, S={S:.2f}, P={P:.2f}")
+
+print("Training completed. Metrics over episodes:")
+print("U:", metrics_history['U'])
+print("E:", metrics_history['E'])
+print("S:", metrics_history['S'])
+print("P:", metrics_history['P'])
 
