@@ -69,9 +69,9 @@ class CommonsGame(gym.Env):
 
     def get_observation(self):
         done = not (np.logical_or.reduce(self.state.layers[Sprites.APPLE], axis=None))
-        
-        observations = []
         board = self.ob_to_image(self.state)['RGB'].transpose([1, 2, 0])
+
+        observations = []
         for agent in [self.game.things[c] for c in self.agent_chars]:
             observation = self.get_agent_observation(board, agent)
             observations.append(observation)
@@ -83,13 +83,13 @@ class CommonsGame(gym.Env):
        
         if self.full_state:
             observation = np.copy(board)
-            observation[agent.position[0], agent.position[1], :] = Colours.RED
+            observation[agent.position[0], agent.position[1], :] = Colours.PURPLE
             observation = observation[self.num_pad_pixels:self.num_pad_pixels + self.map_height + 2,
                     self.num_pad_pixels:self.num_pad_pixels + self.map_width + 2, :]
         else:
             observation = np.copy(board[
                             agent.position[0] - self.sight_radius:agent.position[0] + self.sight_radius + 1,
                             agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
-            observation[self.sight_radius, self.sight_radius, :] = Colours.RED
+            observation[self.sight_radius, self.sight_radius, :] = Colours.PURPLE
 
         return rbg_to_char(observation)

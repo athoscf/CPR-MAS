@@ -45,6 +45,7 @@ class Colours:
     BLACK = [0, 0, 0]
     GRAY = [52, 52, 52]
     WHITE = [180, 180, 180]
+    PURPLE = [255, 0, 255]
 
 class Actions:
     STEP_FORWARD = 0
@@ -72,6 +73,7 @@ class Sprites:
     SCOPE = '-'
     EMPTY = ' '
     AGENT = '%'
+    CURRENT_AGENT = '!'
 
 class BeamRange:
     WIDTH = 2
@@ -97,7 +99,8 @@ COLOUR_TO_CHAR = {
     tuple(Colours.YELLOW): Sprites.BEAM,
     tuple(Colours.GRAY): Sprites.SCOPE,
     tuple(Colours.BLACK): Sprites.EMPTY,
-    tuple(Colours.WHITE): Sprites.WALL
+    tuple(Colours.WHITE): Sprites.WALL,
+    tuple(Colours.PURPLE): Sprites.CURRENT_AGENT
 }
     
 TIMEOUT = 25
