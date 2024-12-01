@@ -2,11 +2,10 @@ import numpy as np
 import random
 from pycolab.rendering import ObservationToArray
 from pycolab import ascii_art
-from CommonsGame.constants import *
+from CommonsGame.resources.constants import *
 from CommonsGame.objects import *
 
-def build_map(map_sketch, num_pad_pixels, agent_chars):
-    num_agents = len(agent_chars)
+def build_map(map_sketch, num_pad_pixels):
     game_map = np.array(map_sketch)
 
     def padWith(vector, pad_width, iaxis, kwargs):
@@ -15,13 +14,6 @@ def build_map(map_sketch, num_pad_pixels, agent_chars):
         vector[:pad_width[0]] = pad_value
         vector[-pad_width[1]:] = pad_value
         return vector
-
-    # Put agents
-    available_cells = np.argwhere(np.logical_and(game_map != Sprites.APPLE, game_map != Sprites.WALL))
-    selected_cells = np.random.choice(available_cells.shape[0], size=(num_agents,), replace=False)
-    agents_pos = available_cells[selected_cells, :]
-    for idx, pos in enumerate(agents_pos):
-        game_map[pos[0], pos[1]] = agent_chars[idx]
     
     # Put border walls
     game_map = np.pad(game_map, num_pad_pixels + 1, padWith, padder='=')
@@ -30,7 +22,7 @@ def build_map(map_sketch, num_pad_pixels, agent_chars):
     return game_map
 
 def build_game(map_sketch, num_pad_pixels, agent_chars):
-    game_map = build_map(map_sketch, num_pad_pixels, agent_chars)
+    game_map = build_map(map_sketch, num_pad_pixels)
 
     agentsOrder = list(agent_chars)
     random.shuffle(agentsOrder)

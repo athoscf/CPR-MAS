@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 import random
-from CommonsGame.constants import *
+from CommonsGame.resources import *
 
 # Parameters
 numAgents = 1
@@ -10,7 +10,7 @@ alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
 
 # Environment setup
-env = gym.make('CommonsGame:CommonsGame-v0', num_agents=numAgents, visual_radius=2, map_sketch=small_map, full_state=True)
+env = gym.make('CommonsGame:CommonsGame-v0', map_config=SmallMap, visual_radius=4, full_state=True)
 action_space = env.action_space.n
 obs_space_shape = (env.map_height + 2 * env.num_pad_pixels, env.map_width + 2 * env.num_pad_pixels, 3)  # Based on provided `getObservation` logic
 Q_tables = [np.zeros((10000, action_space)) for _ in range(numAgents)]  # Replace 10000 with an appropriate state space size

@@ -1,37 +1,3 @@
-big_map = [
-    list('                                      '),
-    list('             @      @@@@@       @     '),
-    list('         @   @@         @@@    @  @   '),
-    list('      @ @@@  @@@    @    @ @@ @@@@    '),
-    list('  @  @@@ @    @  @ @@@  @  @   @ @    '),
-    list(' @@@  @ @    @  @@@ @  @@@        @   '),
-    list('  @ @  @@@  @@@  @ @    @ @@   @@ @@  '),
-    list('   @ @  @@@    @ @  @@@    @@@  @     '),
-    list('    @@@  @      @@@  @    @@@@        '),
-    list('     @       @  @ @@@    @  @         '),
-    list(' @  @@@  @  @  @@@ @    @@@@          '),
-    list('     @ @   @@@  @ @      @ @@   @     '),
-    list('      @@@   @ @  @@@      @@   @@@    '),
-    list('  @    @     @@@  @             @     '),
-    list('              =                       '),
-    list('             =                        '),
-    list('              @                       '),
-    list('              @                       '),
-    list('              @                       '),
-    list('              @                       '),
-    list('              @                       '),
-]
-
-small_map = [
-    list('                     '),
-    list('           @         '),
-    list('          @@@        '),
-    list('         @@@         '),
-    list('          @          '),
-    list('                     '),
-    list('                     '),
-    list('                     ')]
-
 class RespawnProbabilities:
     LOW = 0.01
     MEDIUM = 0.05
@@ -67,7 +33,6 @@ class Orientations:
 class Sprites:
     WALL = '='
     APPLE = '@'
-    AGENTS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     BEAM = '.'
     GIFT = '$'
     SCOPE = '-'

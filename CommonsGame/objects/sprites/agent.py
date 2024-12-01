@@ -1,13 +1,13 @@
 import numpy as np
 from pycolab.prefab_parts import sprites
-from CommonsGame.constants import *
+from CommonsGame.resources.constants import *
 
 class Agent(sprites.MazeWalker):
             
     def __init__(self, corner, position, character, agent_chars):
         super(Agent, self).__init__(corner, position, character, impassable=[Sprites.WALL] + list(agent_chars.replace(character, '')), confined_to_board=True)
         self.agent_chars = agent_chars
-        self.orientation = np.random.choice(NUM_ORIENTATIONS)
+        self.orientation = Orientations.NORTH
         self.index= agent_chars.index(character)
         self.init_pos = position
         self.timeout = 0
