@@ -1,7 +1,7 @@
 import numpy as np
 from pycolab import things as pythings
 from scipy.ndimage import convolve
-from CommonsGame.constants import *
+from CommonsGame.resources.constants import *
 
 class Apple(pythings.Drape):
     
