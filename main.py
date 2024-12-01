@@ -4,7 +4,7 @@ import random
 from CommonsGame.constants import *
 
 # Parameters
-numAgents = 4
+numAgents = 5
 epsilon = 0.1  # Exploration rate
 alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
@@ -20,7 +20,7 @@ def state_to_index(state):
     """Convert observation (state) to a hashable index."""
     if state is None:
         return -1  # Handle None state
-    return hash(str(state)) % 10000  # Simplified; modify if needed for large state spaces
+    return hash(state) % 10000  # Simplified; modify if needed for large state spaces
 
 def select_action(agent_id, observation):
     """Select an action using epsilon-greedy policy."""
@@ -97,7 +97,12 @@ for episode in range(num_episodes):
 
         # Take a step in the environment
         nObservations, nRewards, nDone, nInfo = env.step(nActions)
+        if len(nRewards) != numAgents:
+            print(nRewards)
 
+        if len(nObservations) != numAgents:
+            print(nObservations)
+        
         # Update Q-tables for each agent
         for agent_id in range(numAgents):
             update_q_table(agent_id, observations[agent_id], nActions[agent_id],
@@ -110,12 +115,12 @@ for episode in range(num_episodes):
         tagged_steps += nActions.count(7)
         total_steps += numAgents
 
-        if episode == 500:
+        if episode == 100:
             env.render()
 
     U,E,S,P = calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps)
 
-    if episode % 100 == 0:
+    if episode:
         print(f"Episode {episode + 1}: U={U:.2f}, E={E:.2f}, S={S:.2f}, P={P:.2f}")
 
 print("Training completed. Metrics over episodes:")
