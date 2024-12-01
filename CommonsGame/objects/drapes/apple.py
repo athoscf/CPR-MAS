@@ -18,7 +18,6 @@ class Apple(pythings.Drape):
             the_plot.add_reward(rewards)
         else:
             the_plot._engine_directives.summed_reward = [r + sr for r, sr in zip(rewards, the_plot._engine_directives.summed_reward)]
-        print(the_plot._engine_directives.summed_reward)
 
         available_cells = self.available_cells(things)
         self.respawn_apples(available_cells, layers)

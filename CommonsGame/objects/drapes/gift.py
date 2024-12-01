@@ -54,17 +54,15 @@ class Gift(pythings.Drape):
         
         rewards = [0 for i in range(len(self.agent_chars))]
         gift_weight = 1 / len(gifted_agents)
-
-        for i, agent in enumerate(self.agent_chars):
-            if agent == gifting_agent:
-                agent.reward -= gift_weight
-                rewards[i] = -gift_weight
-                
-            elif agent in gifted_agents:
-                the_plot.add_reward(gift_weight)
-                agent.reward += gift_weight
-            
-        the_plot.add_reward(rewards)
+        
+        gifting_agent.reward -= 1
+        rewards[gifting_agent.index] -= 1
+        
+        for agent in gifted_agents:
+            agent.reward += gift_weight
+            rewards[agent.index] += gift_weight
+        
+        return rewards
         
         
     def render_north(self, pos, layers, width, height):
@@ -94,4 +92,3 @@ class Gift(pythings.Drape):
             height -= (np.max(collision_idxs) + 1)
             
         return pos[0] - width, pos[0] + width + 1, pos[1] - height, pos[1]
-
