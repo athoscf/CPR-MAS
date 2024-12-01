@@ -7,10 +7,16 @@ class Agent(sprites.MazeWalker):
     def __init__(self, corner, position, character, agent_chars):
         super(Agent, self).__init__(corner, position, character, impassable=['='] + list(agent_chars.replace(character, '')), confined_to_board=True)
         self.agent_chars = agent_chars
-        self.orientation = np.random.choice(NUM_ORIENTATIONS)
+        print(character)
+        if self.character == 'A' : self.orientation = 1
+        if self.character == 'B' : self.orientation = 3
+        if self.character == 'C' : self.orientation = 3
+        
+        self.index = agent_chars.index(character)
+
         self.init_pos = position
         self.timeout = 0
-        self.reward = 0
+        self.reward = 10
         self.handle_action = {
             Actions.STEP_FORWARD: self.step_forward,
             Actions.STEP_BACKWARD: self.step_backward,
@@ -32,7 +38,7 @@ class Agent(sprites.MazeWalker):
             self.remove_from_board()
             return
         
-        action = actions[self.agent_chars.index(self.character)]
+        action = actions[self.index]
         
         if action in self.handle_action:
             self.handle_action[action](board, the_plot)

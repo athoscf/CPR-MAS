@@ -78,7 +78,7 @@ class BeamRange:
     
 class GiftRange:
     WIDTH = 2
-    HEIGHT = 5
+    HEIGHT = 10
     
 DEFAULT_COLOURS = [
     (Sprites.WALL, Colours.WHITE),

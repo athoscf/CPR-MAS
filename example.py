@@ -4,14 +4,14 @@ import warnings
 from CommonsGame.constants import *
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-numAgents = 2
+numAgents = 3
 
 env = gym.make('CommonsGame:CommonsGame-v0', num_agents=numAgents, visual_radius=5, map_sketch=small_map)
 env.reset()
-for t in range(100):
-    nActions = [7, 7]
+
+# while i dont click esc
+for t in range(3):
+    nActions = [8, 6, 6]
     nObservations, nRewards, nDone, nInfo = env.step(nActions)
-    if (t == 99):
-        print(nObservations)
     env.render()
 

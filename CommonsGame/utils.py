@@ -19,9 +19,13 @@ def build_map(map_sketch, num_pad_pixels, agent_chars):
     # Put agents
     available_cells = np.argwhere(np.logical_and(game_map != Sprites.APPLE, game_map != Sprites.WALL))
     selected_cells = np.random.choice(available_cells.shape[0], size=(num_agents,), replace=False)
+    
     agents_pos = available_cells[selected_cells, :]
-    for idx, pos in enumerate(agents_pos):
-        game_map[pos[0], pos[1]] = agent_chars[idx]
+    # for idx, pos in enumerate(agents_pos):
+    #     game_map[pos[0], pos[1]] = agent_chars[idx]
+    game_map[3, 7] = agent_chars[0]
+    game_map[3, 13] = agent_chars[1]
+    game_map[5, 13] = agent_chars[2]
     
     # Put border walls
     game_map = np.pad(game_map, num_pad_pixels + 1, padWith, padder='=')
