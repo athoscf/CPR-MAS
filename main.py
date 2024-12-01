@@ -41,15 +41,11 @@ def update_q_table(agent_id, obs, action, reward, next_obs):
     Q_tables[agent_id][state_idx][action] += alpha * td_error
 
 def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
-    # Calculate metrics after the episode
     U = np.mean(episode_rewards)  
     total_rewards = np.sum(episode_rewards)
 
     if total_rewards > 0:
-        # Compute pairwise differences without building a full matrix
-        pairwise_diff_sum = sum(
-            abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:]
-        ) * 2  # Multiply by 2 since we only consider half of the pairs
+        pairwise_diff_sum = sum(abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:]) * 2 
         E = 1 - (pairwise_diff_sum / (2 * numAgents * total_rewards))
     else:
         E = 0
