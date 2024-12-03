@@ -79,17 +79,26 @@ class CommonsGame(gym.Env):
         return observations, done
 
     def get_agent_observation(self, board, agent):
-        if not agent.visible and agent.timeout != TIMEOUT: return 'None'
-       
+        # If the agent is not visible and has timed out, return a zero-padded observation
+        if not agent.visible and agent.timeout != TIMEOUT:
+            if self.full_state:
+                observation = np.zeros((self.map_height + 2, self.map_width + 2, board.shape[-1]), dtype=np.float32)
+            else:
+                observation = np.zeros((2 * self.sight_radius + 1, 2 * self.sight_radius + 1, board.shape[-1]), dtype=np.float32)
+            return observation
+
+        # Full state observation
         if self.full_state:
             observation = np.copy(board)
             observation[agent.position[0], agent.position[1], :] = Colours.PURPLE
             observation = observation[self.num_pad_pixels:self.num_pad_pixels + self.map_height + 2,
-                    self.num_pad_pixels:self.num_pad_pixels + self.map_width + 2, :]
+                                    self.num_pad_pixels:self.num_pad_pixels + self.map_width + 2, :]
+        # Partial state observation
         else:
             observation = np.copy(board[
-                            agent.position[0] - self.sight_radius:agent.position[0] + self.sight_radius + 1,
-                            agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
+                agent.position[0] - self.sight_radius:agent.position[0] + self.sight_radius + 1,
+                agent.position[1] - self.sight_radius:agent.position[1] + self.sight_radius + 1, :])
             observation[self.sight_radius, self.sight_radius, :] = Colours.PURPLE
-        
-        return observation.tobytes()
+
+        return observation
+
