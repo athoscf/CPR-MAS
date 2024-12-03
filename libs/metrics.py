@@ -17,8 +17,7 @@ class Metrics:
         self.rewards.append(rewards)
     
     def calculate_efficiency(self):
-        total_rewards_per_agent = [sum(agent_rewards) for agent_rewards in self.rewards]
-        self.efficiency = np.mean(total_rewards_per_agent)
+        self.efficiency = np.mean( [sum(sublist[i] for sublist in self.rewards) for i in range(len(self.rewards[0]))])
 
     
     def calculate_equality(self):

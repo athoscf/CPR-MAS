@@ -5,7 +5,7 @@ import random
 from CommonsGame.resources import *
 from libs.metrics import *
 # Parameters
-numAgents = 9
+numAgents = 1
 epsilon = 0.05  # Exploration rate
 alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
@@ -44,17 +44,17 @@ def update_q_table(agent_id, obs, action, reward, next_obs):
 # Main loop
 done = False
 
-num_episodes = 1000
+num_episodes = 100
 
 metrics_values = []
 for episode in range(1,num_episodes+1):
     done = False
     env.reset()
+    metrics = Metrics(numAgents)
     # For each episode, run until done
     for t in range(1000):  # You can also set a maximum number of time steps per episode if desired
         if done:
-            break
-        metrics = Metrics(numAgents)
+            break  
         # Get observations for all agents
         observations, done = env.get_observation()
 
