@@ -1,10 +1,11 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import gym
 import random
 from CommonsGame.resources import *
 
 # Parameters
-numAgents = 5
+numAgents = 1
 epsilon = 0.1  # Exploration rate
 alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
@@ -52,22 +53,39 @@ def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
     S = np.mean([np.mean(times) if times else 0 for times in reward_times])
     P = (total_steps - tagged_steps) / total_steps if total_steps > 0 else 0  
 
-    metrics_history['U'].append(U)
-    metrics_history['E'].append(E)
-    metrics_history['S'].append(S)
-    metrics_history['P'].append(P)
+    efficiency.append(U)
+    equality.append(E)
+    sustainability.append(S)
+    peace.append(P)
 
-    return U,E,S,P
+    return
+
+def plot_metric(metric_values, metric_name):
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(metric_values, label=metric_name)
+
+    plt.xlabel('Episode')
+    plt.ylabel(f'{metric_name}')
+    plt.legend()
+    plt.grid(True)
+
+    plt.savefig(f'{metric_name}_history.png')
+    plt.show()  
+    return 
+
+
 # Main loop
 done = False
 
-num_episodes = 1000
+num_episodes = 1500
 
-metrics_history = {'U': [], 'E': [], 'S': [], 'P': []}
-U = 0
-E = 0
-S = 0
-P = 0
+efficiency = []
+equality = []
+sustainability = []
+peace = []
+
 for episode in range(num_episodes):
     done = False
     env.reset()
@@ -115,17 +133,13 @@ for episode in range(num_episodes):
         tagged_steps += nActions.count(7)
         total_steps += numAgents
 
-        if episode == 100:
-            env.render()
-
-    U,E,S,P = calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps)
+    calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps)
 
     if episode:
-        print(f"Episode {episode + 1}: U={U:.2f}, E={E:.2f}, S={S:.2f}, P={P:.2f}")
+        print(f"Episode {episode + 1}")
 
-print("Training completed. Metrics over episodes:")
-print("U:", metrics_history['U'])
-print("E:", metrics_history['E'])
-print("S:", metrics_history['S'])
-print("P:", metrics_history['P'])
 
+plot_metric(efficiency,'Efficiency(U)')
+plot_metric(equality,'Equality(E)')
+plot_metric(sustainability,'sustainability(S)')
+plot_metric(peace,'Peace(P)')
