@@ -1,6 +1,6 @@
 import numpy as np
 from pycolab import things as pythings
-from CommonsGame.constants import *
+from CommonsGame.resources.constants import *
 
 class Scope(pythings.Drape):
 

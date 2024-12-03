@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gym
 from gym import spaces
-from CommonsGame.constants import *
+from CommonsGame.resources.constants import *
 from CommonsGame.utils import *
 from CommonsGame.objects import *
 
@@ -13,7 +13,7 @@ class CommonsGame(gym.Env):
         'render_fps': 5    
     }
 
-    def __init__(self, num_agents, visual_radius, map_sketch=big_map, full_state=False):
+    def __init__(self, map_config, visual_radius, full_state=False):
         super(CommonsGame, self).__init__()
         self.full_state = full_state
         
@@ -22,12 +22,12 @@ class CommonsGame(gym.Env):
         ob_height = ob_width = visual_radius * 2 + 1
         
         # Setup game
-        self.num_agents = num_agents
+        self.num_agents = map_config.num_agents
         self.sight_radius = visual_radius
-        self.agent_chars = agent_chars = Sprites.AGENTS[0:num_agents]
-        self.map_height = len(map_sketch)
-        self.map_width = len(map_sketch[0])
-        self.map_sketch = map_sketch
+        self.agent_chars = agent_chars = map_config.agent_chars
+        self.map_height = len(map_config.map)
+        self.map_width = len(map_config.map[0])
+        self.map = map_config.map
         
         if full_state:
             self.observation_space = spaces.Box(low=0, high=255, shape=(self.map_height + 2, self.map_width + 2, 3), dtype=np.uint8)
@@ -35,7 +35,7 @@ class CommonsGame(gym.Env):
             self.observation_space = spaces.Box(low=0, high=255, shape=(ob_height, ob_width, 3), dtype=np.uint8)
         
         self.num_pad_pixels = num_pad_pixels = visual_radius - 1
-        self.game = build_game(map_sketch, num_pad_pixels, agent_chars)        
+        self.game = build_game(self.map, num_pad_pixels, agent_chars)        
         self.state = None
         
         # Pycolab related setup:        
@@ -50,7 +50,7 @@ class CommonsGame(gym.Env):
 
     def reset(self):
         # Reset the state of the environment to an initial state
-        self.game = build_game(self.map_sketch, self.num_pad_pixels, self.agent_chars)  
+        self.game = build_game(self.map, self.num_pad_pixels, self.agent_chars)  
         self.state, _, _ = self.game.its_showtime()
         observations, _ = self.get_observation()
         return observations
