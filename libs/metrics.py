@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Metrics:
     def __init__(self, num_agents):
@@ -16,14 +17,95 @@ class Metrics:
         self.rewards.append(rewards)
     
     def calculate_efficiency(self):
-        sm = sum(sum(agent_rewards) for agent_rewards in self.rewards)
-        self.efficiency = sm / self.num_agents
+        total_rewards_per_agent = [sum(agent_rewards) for agent_rewards in self.rewards]
+        self.efficiency = np.mean(total_rewards_per_agent)
 
+    
     def calculate_equality(self):
         total_rewards = np.array(self.rewards)
-        episode_rewards = np.sum(total_rewards,axis = 0)
-        gini = 0
-        for i,j in enumerate(1,episode_rewards[1:]):
-            gini += np.sum(np.abs(i-episode_rewards[j]))
+        episode_rewards = np.sum(total_rewards, axis=0)
         
-        return gini / len(episode_rewards)**2 * 
+        abs_differences = np.abs(episode_rewards[:, None] - episode_rewards)
+        gini = np.sum(abs_differences)
+
+        n = len(episode_rewards)
+
+        if (n == 0 or sum(episode_rewards) == 0):
+            self.equality = 0
+            return
+        gini_coefficient = gini / (2 * n * sum(episode_rewards))
+        self.equality = 1 - gini_coefficient
+    
+    def calculate_sustainability(self):
+        rewards = np.array(self.rewards) 
+        n_episodes = rewards.shape[0]
+
+        total_sum = np.sum(rewards)
+
+        self.sustainability = total_sum / n_episodes
+
+    def calculate_peace(self):
+        steps = len(self.observations)
+        tagged = 0
+        for observation_step in self.observations:
+            tagged += sum([1 for obs in observation_step if obs is None])
+
+        total_observations = steps * self.num_agents
+        self.peace = (total_observations - tagged) / steps
+
+    def calculate_metrics(self):
+        self.calculate_efficiency()
+        self.calculate_equality()
+        self.calculate_sustainability()
+        self.calculate_peace()
+
+        self.observations = []
+        self.rewards = []
+
+def plot_metrics(metrics_history, num_episodes, filename): 
+    fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
+
+    if not isinstance(metrics_history, list):
+        metrics_history = [metrics_history]
+
+    efficiency = [m.efficiency for m in metrics_history]
+    equality = [m.equality for m in metrics_history]
+    sustainability = [m.sustainability for m in metrics_history]
+    peace = [m.peace for m in metrics_history]
+
+    x = np.arange(1, num_episodes + 1)  
+
+    window_size = 100
+    min_periods = 25
+
+    # Loop through the metrics
+    for i, metric in enumerate([efficiency, sustainability, equality, peace]):
+        metric = np.array(metric)
+
+        # Compute rolling average
+        rolling_avg = np.array([
+            np.mean(metric[max(0, j - window_size + 1):j + 1])
+            if j + 1 >= min_periods else np.nan
+            for j in range(len(metric))
+        ])
+
+        # Plot metrics
+        ax[i].plot(x, metric, alpha=0.5, label="Value")
+        ax[i].plot(x, rolling_avg, label="Rolling Avg", linestyle='--')
+
+        ax[i].legend()
+
+    # Set axis labels
+    ax[0].set_ylabel('Efficiency (U)', fontsize=14)
+    ax[1].set_ylabel('Sustainability (S)', fontsize=14)
+    ax[2].set_ylabel('Equality (E)', fontsize=14)
+    ax[3].set_ylabel('Peacefulness (P)', fontsize=14)
+    ax[3].set_xlabel('Episode', fontsize=14)
+
+    # Add grid lines
+    for i in range(4):
+        ax[i].yaxis.grid(linestyle='--')
+
+    fig.tight_layout()
+    fig.savefig(filename)
+    print("Plotted metrics!")

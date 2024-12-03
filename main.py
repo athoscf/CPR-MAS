@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import gym
 import random
 from CommonsGame.resources import *
-
+from libs.metrics import *
 # Parameters
-numAgents = 1
-epsilon = 0.1  # Exploration rate
+numAgents = 9
+epsilon = 0.05  # Exploration rate
 alpha = 0.1    # Learning rate
 gamma = 0.99   # Discount factor
 
@@ -41,65 +41,20 @@ def update_q_table(agent_id, obs, action, reward, next_obs):
     td_error = td_target - Q_tables[agent_id][state_idx][action]
     Q_tables[agent_id][state_idx][action] += alpha * td_error
 
-def calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps):
-    U = np.mean(episode_rewards)  
-    total_rewards = np.sum(episode_rewards)
-
-    if total_rewards > 0:
-        pairwise_diff_sum = sum(abs(x - y) for i, x in enumerate(episode_rewards) for y in episode_rewards[i+1:])
-        E = 1 - (pairwise_diff_sum / (2 * numAgents * total_rewards))
-    else:
-        E = 0
-    S = np.mean([np.mean(times) if times else 0 for times in reward_times])
-    P = (total_steps - tagged_steps) / total_steps if total_steps > 0 else 0  
-
-    efficiency.append(U)
-    equality.append(E)
-    sustainability.append(S)
-    peace.append(P)
-
-    return
-
-def plot_metric(metric_values, metric_name):
-
-    plt.figure(figsize=(10, 6))
-
-    plt.plot(metric_values, label=metric_name)
-
-    plt.xlabel('Episode')
-    plt.ylabel(f'{metric_name}')
-    plt.legend()
-    plt.grid(True)
-
-    plt.savefig(f'{metric_name}_history.png')
-    plt.show()  
-    return 
-
-
 # Main loop
 done = False
 
-num_episodes = 15
+num_episodes = 1000
 
-efficiency = []
-equality = []
-sustainability = []
-peace = []
-
-for episode in range(num_episodes):
+metrics_values = []
+for episode in range(1,num_episodes+1):
     done = False
     env.reset()
-
-    episode_rewards = np.zeros(numAgents) 
-    reward_times = [[] for _ in range(numAgents)] 
-    tagged_steps = 0 
-    total_steps = 0  
-
     # For each episode, run until done
     for t in range(1000):  # You can also set a maximum number of time steps per episode if desired
         if done:
             break
-
+        metrics = Metrics(numAgents)
         # Get observations for all agents
         observations, done = env.get_observation()
 
@@ -115,6 +70,8 @@ for episode in range(num_episodes):
 
         # Take a step in the environment
         nObservations, nRewards, nDone, nInfo = env.step(nActions)
+        metrics.add_step(nObservations,nRewards)
+
         if len(nRewards) != numAgents:
             print(nRewards)
 
@@ -125,21 +82,10 @@ for episode in range(num_episodes):
         for agent_id in range(numAgents):
             update_q_table(agent_id, observations[agent_id], nActions[agent_id],
                            nRewards[agent_id], nObservations[agent_id])
-
-            episode_rewards[agent_id] += nRewards[agent_id]
-            if nRewards[agent_id] > 0:
-                reward_times[agent_id].append(t)
-
-        tagged_steps += nActions.count(7)
-        total_steps += numAgents
-
-    calculate_metrics(episode_rewards, reward_times, tagged_steps, total_steps)
-
-    if episode:
-        print(f"Episode {episode + 1}")
+            
+    metrics.calculate_metrics()
+    metrics_values.append(metrics)
+    print(f"Episode {episode}")
 
 
-plot_metric(efficiency,'Efficiency(U)')
-plot_metric(equality,'Equality(E)')
-plot_metric(sustainability,'sustainability(S)')
-plot_metric(peace,'Peace(P)')
+plot_metrics(metrics_values,num_episodes,'results.png')
