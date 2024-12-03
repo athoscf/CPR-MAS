@@ -17,7 +17,9 @@ class Metrics:
         self.rewards.append(rewards)
     
     def calculate_efficiency(self):
-        self.efficiency = np.mean( [sum(sublist[i] for sublist in self.rewards) for i in range(len(self.rewards[0]))])
+        total_rewards = sum(sum(agent_rewards) for agent_rewards in self.rewards)
+        self.utilitarian_eff = total_rewards / self.num_agents
+
 
     
     def calculate_equality(self):
@@ -36,12 +38,13 @@ class Metrics:
         self.equality = 1 - gini_coefficient
     
     def calculate_sustainability(self):
-        rewards = np.array(self.rewards) 
-        n_episodes = rewards.shape[0]
+        t = 0
+        for i in range(len(self.rewards)):
+            ts = np.array(self.rewards[i]) * i
+            sum_times = np.sum(ts)
+            t += sum_times
 
-        total_sum = np.sum(rewards)
-
-        self.sustainability = total_sum / n_episodes
+        self.sustainability = t / len(self.rewards)
 
     def calculate_peace(self):
         steps = len(self.observations)
