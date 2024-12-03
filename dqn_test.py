@@ -96,7 +96,7 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, social_
         step += 1
         
     for agent in agents:
-        agent.epsilon_decay()
+        agent.decay_epsilon()
 
     # Save scores
     #social_metrics.compute_metrics()
