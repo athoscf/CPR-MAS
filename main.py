@@ -2,7 +2,7 @@ import numpy as np
 import gym
 import random
 from CommonsGame.resources import *
-from CommonsGame.q_learner import QLearner
+from CommonsGame.rl_models.q_learner import QLearner
 
 # Parameters
 numAgents = 1
@@ -67,11 +67,6 @@ for episode in range(num_episodes):
         #    print(observations[0])
 
         nActions = []
-
-        # Determine actions for each agent
-        #for agent_id in range(numAgents):
-        #    action = select_action(agent_id, observations[agent_id])
-        #    nActions.append(action)
         
         for agent in agent_list:
             nActions.append(agent.select_action(observations[agent.id]))
@@ -84,10 +79,6 @@ for episode in range(num_episodes):
         if len(nObservations) != numAgents:
             print(nObservations)
         
-        # Update Q-tables for each agent
-        #for agent_id in range(numAgents):
-        #    update_q_table(agent_id, observations[agent_id], nActions[agent_id],
-        #                   nRewards[agent_id], nObservations[agent_id])
         for agent in agent_list:
             agent.update_q_value(observations[agent.id], nActions[agent.id],
                                  nRewards[agent.id], nObservations[agent.id], nDone[agent.id])
