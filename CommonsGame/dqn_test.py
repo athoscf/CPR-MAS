@@ -95,13 +95,11 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, metrics
         # Current observations will be next old observations
         observations = new_observations
         step += 1
-        metrics.calculate_metrics()
-        metrics_value.append(metrics)
     for agent in agents:
         agent.epsilon_decay()
 
     # Save scores
-    metrics.calculate_metrics
+    metrics.calculate_metrics()
     metrics_value.append(metrics)
     scores.append(score)
     eps_history.append(agents[0].epsilon)
@@ -110,20 +108,18 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, metrics
     avg_score = np.mean(scores[-100:])
 
     print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, agents[0].epsilon))
-    # if episode in save_episodes_as_gifs:
-    #     do_plots_and_gifs(base_path, episode, frames, obs, scores, eps_history, loss_history, social_metrics_history)
-
+            
 
 def main():    
     
     # Hyperparameters
     n_episodes = 15
-    num_agents = OpenMap.num_agents
+    num_agents = SmallMap.num_agents
     visual_radius = 5
     warmup_steps = 50000
 
     input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
-    env = gym.make('CommonsGame:CommonsGame-v0', map_config=OpenMap, visual_radius=visual_radius)
+    env = gym.make('CommonsGame:CommonsGame-v0', map_config=SmallMap, visual_radius=visual_radius)
 
     agents = [Agent(input_dims=input_dims, n_actions=8) for _ in range(num_agents)]
 
@@ -135,8 +131,9 @@ def main():
 
     for episode in range(1, n_episodes + 1):
         run_episode(episode, env, agents, scores, eps_history, loss_history, metrics_values)
+    plot_metrics(metrics_values,episode,'results.png')
 
-    plot_metrics(metrics_values,n_episodes,'results.png')
+
      
 if __name__ == "__main__":
     main()
