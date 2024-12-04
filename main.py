@@ -2,7 +2,7 @@ from CommonsGame import *
 from DQN import *
 
 def main():    
-    original_open_map = TestModel(num_episodes=5, map=OpenMap, visual_radius=5, warmup_steps=1000)
+    original_open_map = TestModel(num_episodes=15, map=OpenMap, visual_radius=5, warmup_steps=1000)
     original_open_map.execute()
     # Original maps
     # original_small_map = TestModel(num_episodes=15, map=SmallMap, visual_radius=5, warmup_steps=1000, csv_filename="small_map_result.csv")

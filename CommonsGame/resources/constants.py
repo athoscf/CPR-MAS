@@ -55,12 +55,14 @@ class ActionPolicies:
     TAG_ONLY = 1
     GIFT_ONLY = 2
     TAG_AND_GIFT = 3
+    DEFAULT = 4
     
 FILE_PATHS = {
     SmallMap : "results/small_map/",
     OpenMap : "results/open_map/",
     SingleEntranceMap: "results/single_entrance_map/",
-    MultipleEntranceMap: "results/multiple_entrance_map/"
+    MultipleEntranceMap: "results/multiple_entrance_map/",
+    RegionMap:"results/region_map/"
 }      
     
 DEFAULT_COLOURS = [

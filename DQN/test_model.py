@@ -45,7 +45,9 @@ class TestModel():
         elif action_policy == ActionPolicies.GIFT_ONLY:
             return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=True) for _ in range(self.num_agents)]
         elif action_policy == ActionPolicies.MIXED:
-            return [Agent(input_dims=self.input_dims, tag_enabled=random.choice([True, False]), gift_enabled=random.choice([True, False])) for _ in range(self.num_agents)]   
+            return [Agent(input_dims=self.input_dims, tag_enabled=random.choice([True, False]), gift_enabled=random.choice([True, False])) for _ in range(self.num_agents)] 
+        elif action_policy == ActionPolicies.DEFAULT:
+            return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=False) for _ in range(self.num_agents)]
         
     def warmup_replay_buffer(self):
         step = 0 
@@ -155,7 +157,7 @@ class TestModel():
 
         avg_score = np.mean(scores[-100:])
 
-        if episode in [1, 1000]:
+        if episode in [1, self.num_episodes]:
             thread = threading.Thread(target=self.store_episode, args=(episode, steps))
             thread.start()
 
