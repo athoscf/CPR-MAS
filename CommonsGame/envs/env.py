@@ -9,7 +9,7 @@ from CommonsGame.objects import *
 class CommonsGame(gym.Env):
 
     metadata = {
-        'render_modes': ['None', 'human'],
+        'render_modes': ['None', 'human', 'rgb_array'],
         'render_fps': 5    
     }
 
@@ -60,12 +60,16 @@ class CommonsGame(gym.Env):
         board = self.ob_to_image(self.state)['RGB'].transpose([1, 2, 0])
         board = board[self.num_pad_pixels:self.num_pad_pixels + self.map_height + 2,
                 self.num_pad_pixels:self.num_pad_pixels + self.map_width + 2, :]
-        plt.figure(1)
-        plt.imshow(board)
-        plt.axis("off")
-        plt.show(block=False)
-        plt.pause(.05)
-        plt.clf()
+        
+        if mode == 'human':
+            plt.figure(1)
+            plt.imshow(board)
+            plt.axis("off")
+            plt.show(block=False)
+            plt.pause(.05)
+            plt.clf()
+            
+        return board
 
     def get_observation(self):
         done = not (np.logical_or.reduce(self.state.layers[Sprites.APPLE], axis=None))
