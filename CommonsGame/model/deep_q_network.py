@@ -7,7 +7,6 @@ class DeepQNetwork(nn.Module):
       super(DeepQNetwork, self).__init__()
 
       self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
       self.input_dims = input_dims
       self.n_actions = n_actions
 
