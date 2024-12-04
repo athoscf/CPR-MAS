@@ -1,7 +1,4 @@
-import logging
-import os
-
-from CommonsGame.rl_models.dqn_agent import Agent
+from CommonsGame.model import *
 import gym
 import numpy as np
 #from libs.utils import plot_learning_curve, save_frames_as_gif_big_map, save_observations_as_gif, plot_social_metrics
@@ -36,7 +33,7 @@ def warmup_replay_buffer(env, warmup_steps, agents):
                 if type(observations_[ag]) == type(None):
                     continue
                 if type(observations[ag]) == type(None):
-                    observations[ag] = np.copy(agents[ag].ER.buffer[-1][0])
+                    observations[ag] = np.copy(agents[ag].replay_buffer.buffer[-1][0])
 
                 agents[ag].store_transition(observations[ag], actions[ag], rewards[ag], observations_[ag], done[ag])
 
@@ -51,7 +48,7 @@ def train_agent(agent, observation, observation_, action, reward, done):
     if type(observation_) == type(None):
         return
     if type(observation) == type(None):
-        observation = np.copy(agent.ER.buffer[-1][0])
+        observation = np.copy(agent.replay_buffer.buffer[-1][0])
 
     agent.store_transition(observation, action, reward, observation_, done)
     loss = agent.learn()
@@ -96,7 +93,7 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, social_
         step += 1
         
     for agent in agents:
-        agent.epsilon_decay()
+        agent.decay_epsilon()
 
     # Save scores
     #social_metrics.compute_metrics()
@@ -116,14 +113,14 @@ def main():
     
     # Hyperparameters
     n_episodes = 5000
-    num_agents = OpenMap.num_agents
+    num_agents = SmallMap.num_agents
     visual_radius = 5
-    warmup_steps = 50000
+    warmup_steps = 1000
 
     input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
-    env = gym.make('CommonsGame:CommonsGame-v0', map_config=OpenMap, visual_radius=visual_radius)
+    env = gym.make('CommonsGame:CommonsGame-v0', map_config=SmallMap, visual_radius=visual_radius)
 
-    agents = [Agent(input_dims=input_dims, n_actions=8) for _ in range(num_agents)]
+    agents = [Agent(input_dims=input_dims, num_actions=8) for _ in range(num_agents)]
 
     print("warming up replay buffer...")
     warmup_replay_buffer(env, warmup_steps, agents)
