@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 
 class TestModel():
     
-    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicies.TAG_ONLY, csv_filename="result.csv"): 
+    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicies.TAG_ONLY): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
@@ -24,8 +24,6 @@ class TestModel():
         self.env = gym.make('CommonsGame:CommonsGame-v0', map_config=map, visual_radius=visual_radius)
 
         self.agents = self.create_agents(action_policy)
-        
-        self.csv_filename = csv_filename
 
     def execute(self):
         print("warming up replay buffer...")
@@ -157,12 +155,12 @@ class TestModel():
 
         avg_score = np.mean(scores[-100:])
 
-        if episode in [1,2 , 3]:
+        if episode in [1, 1000]:
             thread = threading.Thread(target=self.store_episode, args=(episode, steps))
             thread.start()
 
         print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, self.agents[0].epsilon))
         
         if episode % 5 == 0:
-            save_as_csv(metrics_values, episode, self.csv_filename)
+            Metrics.save_as_csv(metrics_values, self.map)
         
