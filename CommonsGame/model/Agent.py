@@ -3,17 +3,27 @@ import torch.nn as nn
 import numpy as np
 from CommonsGame.model.deep_q_network import DeepQNetwork
 from CommonsGame.model.replay_buffer import ReplayBuffer
+from CommonsGame.resources import *
 
 class Agent:
     
-    def __init__(self, input_dims, num_actions):
-        self.Q_network = DeepQNetwork(input_dims, num_actions)
-        self.Q_target_network = DeepQNetwork(input_dims, num_actions)
+    def __init__(self, input_dims, tag_enabled, gift_enabled):
+        
+        if gift_enabled and tag_enabled:
+            self.action_space = [i for i in range(9)]
+            self.action_policy = ActionPolicy.TAG_AND_GIFT
+        elif tag_enabled:
+            self.action_space = [i for i in range(8)]
+            self.action_policy = ActionPolicy.TAG_ONLY
+        else:
+            self.action_space = [i for i in range(7)] + [8]
+            self.action_policy = ActionPolicy.GIFT_ONLY
+        
+        self.Q_network = DeepQNetwork(input_dims, len(self.action_space))
+        self.Q_target_network = DeepQNetwork(input_dims, len(self.action_space))
 
         self.Q_network.init_weights()
         DeepQNetwork.copy_target(self.Q_target_network, self.Q_network)
-
-        self.action_space = [i for i in range(num_actions)]
 
         self.criterion = nn.MSELoss()
         self.optimizer = torch.optim.Adam(self.Q_network.parameters(), lr=5e-4)
@@ -40,6 +50,10 @@ class Agent:
             terminated_batch = torch.FloatTensor(terminated_batch).to(dtype=torch.long).to(self.Q_network.device).unsqueeze(1)
            
             q_targets_next = torch.max(self.Q_target_network(next_state_batch).detach(), dim=1, keepdim=True)[0]
+            
+            if self.action_policy == ActionPolicy.GIFT_ONLY:
+                action_batch[action_batch == 8] = 7
+                
             q_expected = torch.gather(self.Q_network(state_batch), 1, action_batch)
             target = reward_batch + (1 - (terminated_batch)) * self.gamma * q_targets_next
 

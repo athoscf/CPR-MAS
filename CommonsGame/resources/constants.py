@@ -48,6 +48,12 @@ class GiftRange:
     WIDTH = 2
     HEIGHT = 5
     
+class ActionPolicy:
+    MIXED = 0
+    TAG_ONLY = 1
+    GIFT_ONLY = 2
+    TAG_AND_GIFT = 3
+    
 DEFAULT_COLOURS = [
     (Sprites.WALL, Colours.WHITE),
     (Sprites.APPLE, Colours.GREEN),
