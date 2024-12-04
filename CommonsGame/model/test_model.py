@@ -1,4 +1,9 @@
-from CommonsGame import *
+import gym
+import numpy as np
+from CommonsGame.model.agent import Agent
+from CommonsGame.model.replay_buffer import ReplayBuffer as ReplayBuffer
+from CommonsGame.resources import *
+from CommonsGame.model.metrics import *
 
 class TestModel():
     
@@ -18,11 +23,11 @@ class TestModel():
         self.warmup_replay_buffer()
         print("replay buffer warmed up...")
 
-        scores, eps_history, social_metrics_history, loss_history = [], [], [], []
+        scores, eps_history, metrics_values, loss_history = [], [], [], []
 
         for episode in range(1, self.num_episodes + 1):
-            self.run_episode(episode, scores, eps_history, loss_history, social_metrics_history)
-    
+            self.run_episode(episode, scores, eps_history, loss_history,metrics_values)
+        plot_metrics(metrics_values,self.num_episodes,'result.png')
     def warmup_replay_buffer(self):
         step = 0 
         while step < self.warmup_steps:
@@ -83,8 +88,8 @@ class TestModel():
                 observations[i] = np.copy(agent.replay_buffer.buffer[-1][0])
             agent.store_transition(observations[i], actions[i], rewards[i], observations_[i], done[i])
 
-    def run_episode(self, episode, scores, eps_history, loss_history, social_metrics_history):
-        #social_metrics = SocialMetrics(len(agents))
+    def run_episode(self, episode, scores, eps_history, loss_history, metrics_values):
+        metrics = Metrics(self.num_agents)
         score = 0
         done = [False]
         observations = self.env.reset()
@@ -96,7 +101,7 @@ class TestModel():
             
             # Actions are played, rewards are received.
             new_observations, rewards, done, info = self.env.step(actions)
-
+            metrics.add_step(new_observations,rewards)
             score += rewards[0]
 
             losses = self.train_agents(observations, losses, new_observations, actions, rewards, done)
@@ -108,8 +113,8 @@ class TestModel():
             agent.decay_epsilon()
 
         # Save scores
-        #social_metrics.compute_metrics()
-        #social_metrics_history.append(social_metrics)
+        metrics.calculate_metrics()
+        metrics_values.append(metrics)
         scores.append(score)
         eps_history.append(self.agents[0].epsilon)
         loss_history.append(np.array(losses).mean())
@@ -117,5 +122,4 @@ class TestModel():
         avg_score = np.mean(scores[-100:])
 
         print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, self.agents[0].epsilon))
-        # if episode in save_episodes_as_gifs:
-        #     do_plots_and_gifs(base_path, episode, frames, obs, scores, eps_history, loss_history, social_metrics_history)
+        

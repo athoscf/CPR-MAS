@@ -1,10 +1,13 @@
-from CommonsGame.model import *
+import logging
+import os
+
+from rl_models.dqn_agent import Agent
 import gym
 import numpy as np
-#from libs.utils import plot_learning_curve, save_frames_as_gif_big_map, save_observations_as_gif, plot_social_metrics
-from CommonsGame.resources import *
+from resources import *
+from libs.metrics import *
 import threading
-#from libs.socialmetrics import SocialMetrics
+
 
 
 def warmup_replay_buffer(env, warmup_steps, agents):
@@ -28,12 +31,12 @@ def warmup_replay_buffer(env, warmup_steps, agents):
 
             # Actions are played, rewards are received.
             observations_, rewards, done, info = env.step(actions)
-
+            
             for ag in range(len(agents)):
                 if type(observations_[ag]) == type(None):
                     continue
                 if type(observations[ag]) == type(None):
-                    observations[ag] = np.copy(agents[ag].replay_buffer.buffer[-1][0])
+                    observations[ag] = np.copy(agents[ag].ER.buffer[-1][0])
 
                 agents[ag].store_transition(observations[ag], actions[ag], rewards[ag], observations_[ag], done[ag])
 
@@ -48,7 +51,7 @@ def train_agent(agent, observation, observation_, action, reward, done):
     if type(observation_) == type(None):
         return
     if type(observation) == type(None):
-        observation = np.copy(agent.replay_buffer.buffer[-1][0])
+        observation = np.copy(agent.ER.buffer[-1][0])
 
     agent.store_transition(observation, action, reward, observation_, done)
     loss = agent.learn()
@@ -68,12 +71,13 @@ def choose_actions(observations, agents):
         actions.append(action)
     return actions
 
-def run_episode(episode, env, agents, scores, eps_history, loss_history, social_metrics_history):
+def run_episode(episode, env, agents, scores, eps_history, loss_history, metrics_value):
 
-    #social_metrics = SocialMetrics(len(agents))
+    
     score = 0
     done = [False]
     observations = env.reset()
+    metrics = Metrics(len(agents))
     losses = []
     step = 0
     while not done[0] and step < 1000:
@@ -83,7 +87,7 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, social_
         # Actions are played, rewards are received.
         new_observations, rewards, done, info = env.step(actions)
         #social_metrics.add_step(new_observations, rewards)
-
+        metrics.add_step(new_observations,rewards)
         score += rewards[0]
 
         losses = train_agents(observations, agents, losses, new_observations, actions, rewards, done)
@@ -91,13 +95,12 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, social_
         # Current observations will be next old observations
         observations = new_observations
         step += 1
-        
     for agent in agents:
-        agent.decay_epsilon()
+        agent.epsilon_decay()
 
     # Save scores
-    #social_metrics.compute_metrics()
-    #social_metrics_history.append(social_metrics)
+    metrics.calculate_metrics()
+    metrics_value.append(metrics)
     scores.append(score)
     eps_history.append(agents[0].epsilon)
     loss_history.append(np.array(losses).mean())
@@ -105,31 +108,32 @@ def run_episode(episode, env, agents, scores, eps_history, loss_history, social_
     avg_score = np.mean(scores[-100:])
 
     print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, agents[0].epsilon))
-    # if episode in save_episodes_as_gifs:
-    #     do_plots_and_gifs(base_path, episode, frames, obs, scores, eps_history, loss_history, social_metrics_history)
-
+            
 
 def main():    
     
     # Hyperparameters
-    n_episodes = 5000
+    n_episodes = 15
     num_agents = SmallMap.num_agents
     visual_radius = 5
-    warmup_steps = 1000
+    warmup_steps = 50000
 
     input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
     env = gym.make('CommonsGame:CommonsGame-v0', map_config=SmallMap, visual_radius=visual_radius)
 
-    agents = [Agent(input_dims=input_dims, num_actions=8) for _ in range(num_agents)]
+    agents = [Agent(input_dims=input_dims, n_actions=8) for _ in range(num_agents)]
 
     print("warming up replay buffer...")
     warmup_replay_buffer(env, warmup_steps, agents)
     print("replay buffer warmed up...")
 
-    scores, eps_history, social_metrics_history, loss_history = [], [], [], []
+    scores, eps_history, metrics_values , loss_history = [], [], [], []
 
     for episode in range(1, n_episodes + 1):
-        run_episode(episode, env, agents, scores, eps_history, loss_history, social_metrics_history)
+        run_episode(episode, env, agents, scores, eps_history, loss_history, metrics_values)
+    plot_metrics(metrics_values,episode,'results.png')
 
+
+     
 if __name__ == "__main__":
     main()
