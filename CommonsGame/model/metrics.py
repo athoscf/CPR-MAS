@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 class Metrics:
     def __init__(self, num_agents):
@@ -108,3 +109,33 @@ def plot_metrics(metrics_values, num_episodes, filename):
     fig.tight_layout()
     fig.savefig(filename)
     print("Plotted metrics!")
+    
+def save_as_csv(metrics_values, current_episode, filename):
+    if not isinstance(metrics_values, list):
+        metrics_values = [metrics_values]
+
+    efficiency = [m.efficiency for m in metrics_values]
+    equality = [m.equality for m in metrics_values]
+    sustainability = [m.sustainability for m in metrics_values]
+    peace = [m.peace for m in metrics_values]
+
+    # Determine the last recorded episode
+    last_recorded_episode = 0
+    if os.path.exists(filename):
+        with open(filename, "r") as file:
+            lines = file.readlines()
+            if len(lines) > 1:  # If there are more than just the header
+                last_line = lines[-1]
+                last_recorded_episode = int(last_line.split(",")[0])
+
+    # Open the file in append mode and write the new data
+    with open(filename, "a") as file:
+        # If the file is empty (or header is missing), write the header
+        if os.path.getsize(filename) == 0:
+            file.write("episode,efficiency,equality,sustainability,peace\n")
+        
+        # Append only new episodes
+        for i, episode_data in enumerate(metrics_values):
+            episode_number = i + 1
+            if episode_number > last_recorded_episode:
+                file.write(f"{episode_number},{efficiency[i]},{equality[i]},{sustainability[i]},{peace[i]}\n")
