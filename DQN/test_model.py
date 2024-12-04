@@ -1,10 +1,15 @@
 import gym
 import numpy as np
 import random
+import threading
+import matplotlib
+from matplotlib import animation
 from DQN.agent import Agent
 from DQN.replay_buffer import ReplayBuffer as ReplayBuffer
 from CommonsGame.resources import *
 from DQN.metrics import *
+
+matplotlib.use('Agg')
 
 class TestModel():
     
@@ -104,6 +109,21 @@ class TestModel():
                 observations[i] = np.copy(agent.replay_buffer.buffer[-1][0])
             agent.store_transition(observations[i], actions[i], rewards[i], observations_[i], done[i])
 
+    def store_episode(self, episode, steps):
+        filename = FILE_PATHS[self.map] + f"episode_{episode}.gif"
+        
+        fig = plt.figure(8, figsize=(steps[0].shape[1] / 64, steps[0].shape[0] / 64), dpi=512)
+        fig.suptitle('tick: 0', fontsize=3, fontweight='bold', fontfamily='monospace')
+        patch = plt.imshow(steps[0])
+        plt.axis('off')
+
+        def animate(i):
+            patch.set_data(steps[i])
+            fig.suptitle(f'step: {i}', fontsize=3, fontweight='bold')
+
+        gif = animation.FuncAnimation(fig, animate, frames = len(steps), interval=50)
+        gif.save(filename, writer='imagemagick', fps=60)
+
     def run_episode(self, episode, scores, eps_history, loss_history, metrics_values):
         metrics = Metrics(self.num_agents)
         score = 0
@@ -111,6 +131,7 @@ class TestModel():
         observations = self.env.reset()
         losses = []
         step = 0
+        steps = []
         while not done[0] and step < 1000:
             actions = self.choose_actions(observations) 
             
@@ -122,6 +143,7 @@ class TestModel():
 
             observations = new_observations
             step += 1
+            steps.append(self.env.render("rgb_array"))
             
         for agent in self.agents:
             agent.decay_epsilon()
@@ -134,6 +156,10 @@ class TestModel():
         loss_history.append(np.array(losses).mean())
 
         avg_score = np.mean(scores[-100:])
+
+        if episode in [1,2 , 3]:
+            thread = threading.Thread(target=self.store_episode, args=(episode, steps))
+            thread.start()
 
         print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, self.agents[0].epsilon))
         
