@@ -4,8 +4,9 @@ import os
 from CommonsGame.resources import *
 
 class Metrics:
-    def __init__(self, num_agents):
+    def __init__(self, num_agents, visual_radius=5):
         self.num_agents = num_agents
+        self.empty_board = np.zeros((2 * visual_radius + 1, 2 * visual_radius + 1, 3), dtype=np.float32)
         self.observations = []
         self.rewards = []
 
@@ -50,7 +51,7 @@ class Metrics:
         steps = len(self.observations)
         tagged = 0
         for observation_step in self.observations:
-            tagged += sum([1 for obs in observation_step if obs is None])
+            tagged += sum([1 for obs in observation_step if np.array_equal(obs, self.empty_board)])
 
         total_observations = steps * self.num_agents
         self.peace = (total_observations - tagged) / steps

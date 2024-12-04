@@ -125,7 +125,7 @@ class TestModel():
         gif.save(filename, writer='imagemagick', fps=60)
 
     def run_episode(self, episode, scores, eps_history, loss_history, metrics_values):
-        metrics = Metrics(self.num_agents)
+        metrics = Metrics(self.num_agents, self.visual_radius)
         score = 0
         done = [False]
         observations = self.env.reset()
