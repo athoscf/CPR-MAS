@@ -3,7 +3,7 @@ from DQN import *
 
 def main():    
     # Original maps
-    original_small_map = TestModel(num_episodes=3, map=SmallMap, visual_radius=5, warmup_steps=1000)
+    original_small_map = TestModel(num_episodes=10, map=SmallMap, visual_radius=5, warmup_steps=20)
     original_small_map.execute()
     
     # original_open_map = TestModel(num_episodes=15, map=OpenMap, visual_radius=5, warmup_steps=1000)
