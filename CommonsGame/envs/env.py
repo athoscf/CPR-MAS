@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import gym
 from gym import spaces
 from CommonsGame.resources.constants import *
-from CommonsGame.utils import *
+from CommonsGame.envs.utils import *
 from CommonsGame.objects import *
 
 class CommonsGame(gym.Env):

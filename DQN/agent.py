@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from CommonsGame.model.deep_q_network import DeepQNetwork
-from CommonsGame.model.replay_buffer import ReplayBuffer
+from DQN.deep_q_network import DeepQNetwork
+from DQN.replay_buffer import ReplayBuffer
 from CommonsGame.resources import *
 
 class Agent:
@@ -11,13 +11,13 @@ class Agent:
         
         if gift_enabled and tag_enabled:
             self.action_space = [i for i in range(9)]
-            self.action_policy = ActionPolicy.TAG_AND_GIFT
+            self.action_policy = ActionPolicies.TAG_AND_GIFT
         elif tag_enabled:
             self.action_space = [i for i in range(8)]
-            self.action_policy = ActionPolicy.TAG_ONLY
+            self.action_policy = ActionPolicies.TAG_ONLY
         else:
-            self.action_space = [i for i in range(7)] + [8]
-            self.action_policy = ActionPolicy.GIFT_ONLY
+            self.action_space = [i for i in range(7)] + [Actions.GIFT]
+            self.action_policy = ActionPolicies.GIFT_ONLY
         
         self.Q_network = DeepQNetwork(input_dims, len(self.action_space))
         self.Q_target_network = DeepQNetwork(input_dims, len(self.action_space))
@@ -51,7 +51,7 @@ class Agent:
            
             q_targets_next = torch.max(self.Q_target_network(next_state_batch).detach(), dim=1, keepdim=True)[0]
             
-            if self.action_policy == ActionPolicy.GIFT_ONLY:
+            if self.action_policy == ActionPolicies.GIFT_ONLY:
                 action_batch[action_batch == 8] = 7
                 
             q_expected = torch.gather(self.Q_network(state_batch), 1, action_batch)
