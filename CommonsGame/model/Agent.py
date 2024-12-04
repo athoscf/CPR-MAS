@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from CommonsGame.model.DeepQNetwork import DeepQNetwork
-from CommonsGame.model.ReplayBuffer import ReplayBuffer
+from CommonsGame.model.deep_q_network import DeepQNetwork
+from CommonsGame.model.replay_buffer import ReplayBuffer
 
 class Agent:
     
