@@ -1,4 +1,8 @@
-from CommonsGame import *
+import gym
+import numpy as np
+from CommonsGame.model.agent import Agent
+from CommonsGame.model.replay_buffer import ReplayBuffer as ReplayBuffer
+from CommonsGame.resources import *
 
 class TestModel():
     
