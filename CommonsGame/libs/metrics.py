@@ -17,11 +17,8 @@ class Metrics:
         self.rewards.append(rewards)
     
     def calculate_efficiency(self):
-        total_rewards = sum(sum(agent_rewards) for agent_rewards in self.rewards)
-        self.utilitarian_eff = total_rewards / self.num_agents
+        self.efficiency = np.mean( [sum(sublist[i] for sublist in self.rewards) for i in range(len(self.rewards[0]))])
 
-
-    
     def calculate_equality(self):
         total_rewards = np.array(self.rewards)
         episode_rewards = np.sum(total_rewards, axis=0)
@@ -64,16 +61,16 @@ class Metrics:
         self.observations = []
         self.rewards = []
 
-def plot_metrics(metrics_history, num_episodes, filename): 
+def plot_metrics(metrics_values, num_episodes, filename): 
     fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
 
-    if not isinstance(metrics_history, list):
-        metrics_history = [metrics_history]
+    if not isinstance(metrics_values, list):
+        metrics_values = [metrics_values]
 
-    efficiency = [m.efficiency for m in metrics_history]
-    equality = [m.equality for m in metrics_history]
-    sustainability = [m.sustainability for m in metrics_history]
-    peace = [m.peace for m in metrics_history]
+    efficiency = [m.efficiency for m in metrics_values]
+    equality = [m.equality for m in metrics_values]
+    sustainability = [m.sustainability for m in metrics_values]
+    peace = [m.peace for m in metrics_values]
 
     x = np.arange(1, num_episodes + 1)  
 

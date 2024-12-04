@@ -8,7 +8,7 @@ class Agent(sprites.MazeWalker):
         super(Agent, self).__init__(corner, position, character, impassable=[Sprites.WALL] + list(agent_chars.replace(character, '')), confined_to_board=True)
         self.agent_chars = agent_chars
         self.orientation = Orientations.NORTH
-        self.index= agent_chars.index(character)
+        self.index = agent_chars.index(character)
         self.init_pos = position
         self.timeout = 0
         self.reward = 0

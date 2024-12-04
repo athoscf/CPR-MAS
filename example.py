@@ -5,19 +5,19 @@ from CommonsGame import *
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-numAgents = 1
+numAgents = RegionMap.num_agents
 
 env = gym.make('CommonsGame:CommonsGame-v0', map_config=RegionMap, visual_radius=4)
-env.reset()\
+env.reset()
     
     
 inp = ''
-# for t in range(50):
-#     nActions = np.random.randint(low=0, high=env.action_space.n, size=(numAgents,)).tolist()
-#     nObservations, nRewards, nDone, nInfo = env.step(nActions)
-#     env.render()
-#     if t == 9:
-#         print(nObservations[0])
+for t in range(50):
+    nActions = np.random.randint(low=0, high=env.action_space.n, size=(numAgents,)).tolist()
+    nObservations, nRewards, nDone, nInfo = env.step(nActions)
+    env.render()
+    if t == 9:
+        print(nObservations[0])
 
 while inp != 'q':
     env.render()

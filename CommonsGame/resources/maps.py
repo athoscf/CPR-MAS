@@ -33,7 +33,7 @@ class OpenMap:
         list('@  @@@  @  @  @@@ @    @@@  @ @     A   '),
         list('    @ @   @@@  @ @      @ @  @@@   B  C '),
         list('     @@@   @ @  @@@      @@@  @  D      '),
-        list(' @    @     @@@  @        @       E F H '),
+        list(' @    @     @@@  @        @       E F G '),
         list('             @                  H  I    '),
     ]
     
