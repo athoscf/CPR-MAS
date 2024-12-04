@@ -1,3 +1,5 @@
+from CommonsGame.resources.maps import *
+
 class RespawnProbabilities:
     LOW = 0.01
     MEDIUM = 0.05
@@ -48,11 +50,18 @@ class GiftRange:
     WIDTH = 2
     HEIGHT = 5
     
-class ActionPolicy:
+class ActionPolicies:
     MIXED = 0
     TAG_ONLY = 1
     GIFT_ONLY = 2
     TAG_AND_GIFT = 3
+    
+FILE_PATHS = {
+    SmallMap : "results/small_map/",
+    OpenMap : "results/open_map/",
+    SingleEntranceMap: "results/single_entrance_map/",
+    MultipleEntranceMap: "results/multiple_entrance_map/"
+}      
     
 DEFAULT_COLOURS = [
     (Sprites.WALL, Colours.WHITE),

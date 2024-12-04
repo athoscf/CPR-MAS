@@ -36,7 +36,7 @@ class Gift(pythings.Drape):
         return [ 
             things[self.agent_chars[i]] 
             for i, a in enumerate(actions) 
-            if a == Actions.GIFT and things[self.agent_chars[i]].visible and things[self.agent_chars[i]].reward > 1
+            if a == Actions.GIFT and things[self.agent_chars[i]].visible and things[self.agent_chars[i]].reward >= 1
         ]
         
     def gifted_agents(self, pos, x_min, x_max, y_min, y_max, things):
@@ -54,7 +54,7 @@ class Gift(pythings.Drape):
     def gift_agents(self, gifting_agent, gifted_agents):
         rewards = [0 for i in range(len(self.agent_chars))]
         
-        if gifting_agent.reward <= 1:
+        if gifting_agent.reward < 1: 
             return rewards
         
         gift_weight = 1 / len(gifted_agents)

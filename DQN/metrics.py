@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from CommonsGame.resources import *
 
 class Metrics:
     def __init__(self, num_agents):
@@ -32,6 +33,7 @@ class Metrics:
         if (n == 0 or sum(episode_rewards) == 0):
             self.equality = 0
             return
+        
         gini_coefficient = gini / (2 * n * sum(episode_rewards))
         self.equality = 1 - gini_coefficient
     
@@ -62,53 +64,46 @@ class Metrics:
         self.observations = []
         self.rewards = []
 
-def plot_metrics(metrics_values, num_episodes, filename): 
-    fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
+    def plot(metrics_values, num_episodes, map): 
+        fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
 
-    if not isinstance(metrics_values, list):
-        metrics_values = [metrics_values]
+        if not isinstance(metrics_values, list):
+            metrics_values = [metrics_values]
 
-    efficiency = [m.efficiency for m in metrics_values]
-    equality = [m.equality for m in metrics_values]
-    sustainability = [m.sustainability for m in metrics_values]
-    peace = [m.peace for m in metrics_values]
+        efficiency = [m.efficiency for m in metrics_values]
+        equality = [m.equality for m in metrics_values]
+        sustainability = [m.sustainability for m in metrics_values]
+        peace = [m.peace for m in metrics_values]
 
-    x = np.arange(1, num_episodes + 1)  
+        x = np.arange(1, num_episodes + 1)  
 
-    window_size = 100
-    min_periods = 25
+        window_size = 100
+        min_periods = 25
 
-    # Loop through the metrics
-    for i, metric in enumerate([efficiency, sustainability, equality, peace]):
-        metric = np.array(metric)
+        for i, metric in enumerate([efficiency, sustainability, equality, peace]):
+            metric = np.array(metric)
+            rolling_avg = np.array([
+                np.mean(metric[max(0, j - window_size + 1):j + 1])
+                if j + 1 >= min_periods else np.nan
+                for j in range(len(metric))
+            ])
 
-        # Compute rolling average
-        rolling_avg = np.array([
-            np.mean(metric[max(0, j - window_size + 1):j + 1])
-            if j + 1 >= min_periods else np.nan
-            for j in range(len(metric))
-        ])
+            ax[i].plot(x, metric, alpha=0.5, label="Value")
+            ax[i].plot(x, rolling_avg, label="Rolling Avg", linestyle='--')
+            ax[i].legend()
 
-        # Plot metrics
-        ax[i].plot(x, metric, alpha=0.5, label="Value")
-        ax[i].plot(x, rolling_avg, label="Rolling Avg", linestyle='--')
+        ax[0].set_ylabel('Efficiency (U)', fontsize=14)
+        ax[1].set_ylabel('Sustainability (S)', fontsize=14)
+        ax[2].set_ylabel('Equality (E)', fontsize=14)
+        ax[3].set_ylabel('Peacefulness (P)', fontsize=14)
+        ax[3].set_xlabel('Episode', fontsize=14)
 
-        ax[i].legend()
+        for i in range(4):
+            ax[i].yaxis.grid(linestyle='--')
 
-    # Set axis labels
-    ax[0].set_ylabel('Efficiency (U)', fontsize=14)
-    ax[1].set_ylabel('Sustainability (S)', fontsize=14)
-    ax[2].set_ylabel('Equality (E)', fontsize=14)
-    ax[3].set_ylabel('Peacefulness (P)', fontsize=14)
-    ax[3].set_xlabel('Episode', fontsize=14)
-
-    # Add grid lines
-    for i in range(4):
-        ax[i].yaxis.grid(linestyle='--')
-
-    fig.tight_layout()
-    fig.savefig(filename)
-    print("Plotted metrics!")
+        fig.tight_layout()
+        fig.savefig(FILE_PATHS[map] + 'metrics.png')
+        print("Plotted metrics!")
     
 def save_as_csv(metrics_values, current_episode, filename):
     if not isinstance(metrics_values, list):
@@ -139,3 +134,4 @@ def save_as_csv(metrics_values, current_episode, filename):
             episode_number = i + 1
             if episode_number > last_recorded_episode:
                 file.write(f"{episode_number},{efficiency[i]},{equality[i]},{sustainability[i]},{peace[i]}\n")
+        
