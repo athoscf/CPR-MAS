@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+import random
 from CommonsGame.model.agent import Agent
 from CommonsGame.model.replay_buffer import ReplayBuffer as ReplayBuffer
 from CommonsGame.resources import *
@@ -7,7 +8,7 @@ from CommonsGame.model.metrics import *
 
 class TestModel():
     
-    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000):
+    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicy.TAG_ONLY): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
@@ -16,7 +17,7 @@ class TestModel():
         self.input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
         self.env = gym.make('CommonsGame:CommonsGame-v0', map_config=map, visual_radius=visual_radius)
 
-        self.agents = [Agent(input_dims=self.input_dims, num_actions=8) for _ in range(self.num_agents)]
+        self.agents = self.create_agents(action_policy)
 
     def execute(self):
         print("warming up replay buffer...")
@@ -27,7 +28,19 @@ class TestModel():
 
         for episode in range(1, self.num_episodes + 1):
             self.run_episode(episode, scores, eps_history, loss_history,metrics_values)
-        plot_metrics(metrics_values,self.num_episodes,'result.png')
+            
+        plot_metrics(metrics_values, self.num_episodes, 'result.png')
+        
+    def create_agents(self, action_policy):
+        if action_policy == ActionPolicy.TAG_AND_GIFT:
+            return [Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=True) for _ in range(self.num_agents)]
+        elif action_policy == ActionPolicy.TAG_ONLY:
+            return [Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=False) for _ in range(self.num_agents)]
+        elif action_policy == ActionPolicy.GIFT_ONLY:
+            return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=True) for _ in range(self.num_agents)]
+        elif action_policy == ActionPolicy.MIXED:
+            return [Agent(input_dims=self.input_dims, tag_enabled=random.choice([True, False]), gift_enabled=random.choice([True, False])) for _ in range(self.num_agents)]   
+        
     def warmup_replay_buffer(self):
         step = 0 
         while step < self.warmup_steps:
@@ -96,12 +109,10 @@ class TestModel():
         losses = []
         step = 0
         while not done[0] and step < 1000:
-            # Each agent chooses its action.
             actions = self.choose_actions(observations) 
             
-            # Actions are played, rewards are received.
             new_observations, rewards, done, info = self.env.step(actions)
-            metrics.add_step(new_observations,rewards)
+            metrics.add_step(new_observations, rewards)
             score += rewards[0]
 
             losses = self.train_agents(observations, losses, new_observations, actions, rewards, done)
