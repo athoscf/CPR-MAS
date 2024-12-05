@@ -62,9 +62,7 @@ class TestModel():
                 self.store_transitions(observations, observations_, actions, rewards, done)
          
                 observations = observations_
-                step += 1
-                if step > self.warmup_steps:
-                    break
+                
         self.env.reset()
 
     def train_agent(self, agent, observation, observation_, action, reward, done):
@@ -132,7 +130,7 @@ class TestModel():
         losses = []
         step = 0
         steps = []
-        while not done[0] and step < 1000:
+        while not done[0]:
             actions = self.choose_actions(observations) 
             
             new_observations, rewards, done, info = self.env.step(actions)
@@ -157,7 +155,7 @@ class TestModel():
 
         avg_score = np.mean(scores[-100:])
 
-        if episode in [1, self.num_episodes]:
+        if episode in [1, 1000, 1500, self.num_episodes]:
             thread = threading.Thread(target=self.store_episode, args=(episode, steps))
             thread.start()
 

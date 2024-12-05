@@ -15,9 +15,12 @@ class Agent:
         elif tag_enabled:
             self.action_space = [i for i in range(8)]
             self.action_policy = ActionPolicies.TAG_ONLY
-        else:
+        elif gift_enabled:
             self.action_space = [i for i in range(7)] + [Actions.GIFT]
             self.action_policy = ActionPolicies.GIFT_ONLY
+        else:
+            self.action_space = [i for i in range(7)]
+            self.action_policy = ActionPolicies.DEFAULT
         
         self.Q_network = DeepQNetwork(input_dims, len(self.action_space))
         self.Q_target_network = DeepQNetwork(input_dims, len(self.action_space))
