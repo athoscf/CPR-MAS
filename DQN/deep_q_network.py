@@ -6,13 +6,13 @@ class DeepQNetwork(nn.Module):
     def __init__(self, input_dims, n_actions):
       super(DeepQNetwork, self).__init__()
 
-      self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+      self.device = torch.device('cpu' if torch.cuda.is_available() else 'cpu')
       self.input_dims = input_dims
       self.n_actions = n_actions
 
       self.conv1 = nn.Conv2d(in_channels=input_dims[2], out_channels=32, kernel_size=3, stride=3)
-      self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=2, stride=2)
-      self.conv3 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1)
+      self.conv2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=2, stride=2)
+      self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=1, stride=1)
       self.fc1 = nn.Linear(64, 64)
       self.Q_network = nn.Linear(64, n_actions)
 

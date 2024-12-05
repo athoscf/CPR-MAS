@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 
 class TestModel():
     
-    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicies.TAG_ONLY): 
+    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicies.MIXED): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
