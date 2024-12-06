@@ -6,7 +6,7 @@ class DeepQNetwork(nn.Module):
     def __init__(self, input_dims, n_actions):
       super(DeepQNetwork, self).__init__()
 
-      self.device = torch.device('gpu' if torch.cuda.is_available() else 'cpu')
+      self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
       
       self.input_dims = input_dims
       self.n_actions = n_actions
