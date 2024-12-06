@@ -13,11 +13,11 @@ matplotlib.use('Agg')
 
 class TestModel():
     
-    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_steps=1000, action_policy=ActionPolicies.MIXED): 
+    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_episodes=1000, action_policy=ActionPolicies.MIXED): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
-        self.warmup_steps = warmup_steps
+        self.warmup_episodes = warmup_episodes
         self.map = map
         
         self.input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
@@ -50,11 +50,12 @@ class TestModel():
             return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=False) for _ in range(self.num_agents)]
         
     def warmup_replay_buffer(self):
-        step = 0 
-        while step < self.warmup_steps:
+        episode = 0 
+        while episode < self.warmup_episodes:
             done = [False]
+            step = 0
             observations = self.env.reset()
-            while not done[0]:
+            while not done[0] and step < 1000:
                 actions = self.choose_random_actions(observations)
 
                 observations_, rewards, done, info = self.env.step(actions)
@@ -62,6 +63,10 @@ class TestModel():
                 self.store_transitions(observations, observations_, actions, rewards, done)
          
                 observations = observations_
+                
+                step += 1
+            episode += 1
+            print(f"Episode {episode} completed")
                 
         self.env.reset()
 
@@ -130,7 +135,7 @@ class TestModel():
         losses = []
         step = 0
         steps = []
-        while not done[0]:
+        while not done[0] and step < 2000:
             actions = self.choose_actions(observations) 
             
             new_observations, rewards, done, info = self.env.step(actions)
