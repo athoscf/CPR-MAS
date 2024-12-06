@@ -8,7 +8,7 @@ def main():
     # original_small_map = TestModel(num_episodes=15, map=SmallMap, visual_radius=5, warmup_steps=1000, csv_filename="small_map_result.csv")
     # original_small_map.execute()
     
-    original_open_map = TestModel(num_episodes=1500, map=OpenMap, visual_radius=5, warmup_episodes=1000)
+    original_open_map = TestModel(num_episodes=1500, map=OpenMap, visual_radius=5, warmup_episodes=10)
     original_open_map.execute()
     
     # # New added maps with walls

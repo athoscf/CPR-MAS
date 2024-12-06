@@ -55,7 +55,7 @@ class CommonsGame(gym.Env):
         observations, _ = self.get_observation()
         return observations
 
-    def render(self, mode='human', close=False):
+    def render(self, mode='rbg_array', close=False):
         # Render the environment to the screen
         board = self.ob_to_image(self.state)['RGB'].transpose([1, 2, 0])
         board = board[self.num_pad_pixels:self.num_pad_pixels + self.map_height + 2,

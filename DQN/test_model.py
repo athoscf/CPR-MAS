@@ -19,7 +19,8 @@ class TestModel():
         self.visual_radius = visual_radius
         self.warmup_episodes = warmup_episodes
         self.map = map
-        
+        self.empty_board = np.zeros((2 * visual_radius + 1, 2 * visual_radius + 1, 3), dtype=np.float32)
+
         self.input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
         self.env = gym.make('CommonsGame:CommonsGame-v0', map_config=map, visual_radius=visual_radius)
 
@@ -71,9 +72,9 @@ class TestModel():
         self.env.reset()
 
     def train_agent(self, agent, observation, observation_, action, reward, done):
-        if type(observation_) == type(None):
+        if np.array_equal(observation_, self.empty_board):
             return
-        if type(observation) == type(None):
+        if np.array_equal(observation, self.empty_board):
             observation = np.copy(agent.replay_buffer.buffer[-1][0])
 
         agent.store_transition(observation, action, reward, observation_, done)
@@ -90,7 +91,7 @@ class TestModel():
     def choose_random_actions(self, observations):
         actions = []
         for i, agent in enumerate(self.agents):
-            if type(observations[i]) == type(None):
+            if np.array_equal(observations[i], self.empty_board):
                 action = Actions.STAND_STILL
             else:
                 action = np.random.choice(agent.action_space)
@@ -106,9 +107,9 @@ class TestModel():
 
     def store_transitions(self, observations, observations_, actions, rewards, done):
         for i, agent in enumerate(self.agents):
-            if type(observations_[i]) == type(None):
+            if np.array_equal(observations_[i], self.empty_board):
                 continue
-            if type(observations[i]) == type(None):
+            if np.array_equal(observations[i], self.empty_board):
                 observations[i] = np.copy(agent.replay_buffer.buffer[-1][0])
             agent.store_transition(observations[i], actions[i], rewards[i], observations_[i], done[i])
 
@@ -146,7 +147,7 @@ class TestModel():
 
             observations = new_observations
             step += 1
-            steps.append(self.env.render("rgb_array"))
+            steps.append(self.env.render())
             
         for agent in self.agents:
             agent.decay_epsilon()
