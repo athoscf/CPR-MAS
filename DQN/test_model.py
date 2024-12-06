@@ -13,30 +13,28 @@ matplotlib.use('Agg')
 
 class TestModel():
     
-    def __init__(self, num_episodes=5000, map=SmallMap, visual_radius=5, warmup_episodes=1000, action_policy=ActionPolicies.MIXED): 
+    def __init__(self, map=OpenMap, action_policy=ActionPolicies.MIXED, num_episodes=1501, visual_radius=5, warmup_steps=5000): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
-        self.warmup_episodes = warmup_episodes
+        self.warmup_steps = warmup_steps
         self.map = map
         self.empty_board = np.zeros((2 * visual_radius + 1, 2 * visual_radius + 1, 3), dtype=np.float32)
-
+        self.action_policy = action_policy
+        
         self.input_dims = [visual_radius * 2 + 1, visual_radius * 2 + 1, 3]
         self.env = gym.make('CommonsGame:CommonsGame-v0', map_config=map, visual_radius=visual_radius)
 
         self.agents = self.create_agents(action_policy)
 
     def execute(self):
-        print("warming up replay buffer...")
         self.warmup_replay_buffer()
-        print("replay buffer warmed up...")
 
-        scores, eps_history, metrics_values, loss_history = [], [], [], []
-
+        metrics_values = []
         for episode in range(1, self.num_episodes + 1):
-            self.run_episode(episode, scores, eps_history, loss_history, metrics_values)
+            self.run_episode(episode, metrics_values)
             
-        Metrics.plot(metrics_values, self.num_episodes, self.map)
+        Metrics.plot(metrics_values, self.num_episodes, self.map, self.action_policy)
         
     def create_agents(self, action_policy):
         if action_policy == ActionPolicies.TAG_AND_GIFT:
@@ -51,25 +49,18 @@ class TestModel():
             return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=False) for _ in range(self.num_agents)]
         
     def warmup_replay_buffer(self):
-        episode = 0 
-        while episode < self.warmup_episodes:
-            done = [False]
-            step = 0
-            observations = self.env.reset()
-            while not done[0] and step < 1000:
-                actions = self.choose_random_actions(observations)
-
-                observations_, rewards, done, info = self.env.step(actions)
-
-                self.store_transitions(observations, observations_, actions, rewards, done)
-         
-                observations = observations_
-                
-                step += 1
-            episode += 1
-            print(f"Episode {episode} completed")
-                
+        print("Warming up replay buffer")
+        done = [False]
+        step = 0
+        observations = self.env.reset()
+        while not done[0] and step < self.warmup_steps:
+            actions = self.choose_random_actions(observations)
+            observations_, rewards, done, info = self.env.step(actions)
+            self.store_transitions(observations, observations_, actions, rewards, done)
+            observations = observations_
+            step += 1
         self.env.reset()
+        print("Replay buffer warmed up")
 
     def train_agent(self, agent, observation, observation_, action, reward, done):
         if np.array_equal(observation_, self.empty_board):
@@ -114,7 +105,7 @@ class TestModel():
             agent.store_transition(observations[i], actions[i], rewards[i], observations_[i], done[i])
 
     def store_episode(self, episode, steps):
-        filename = FILE_PATHS[self.map] + f"episode_{episode}.gif"
+        filename = FILE_PATHS[self.map] + self.action_policy + f"/episode_{episode}.gif"
         
         fig = plt.figure(8, figsize=(steps[0].shape[1] / 64, steps[0].shape[0] / 64), dpi=512)
         fig.suptitle('tick: 0', fontsize=3, fontweight='bold', fontfamily='monospace')
@@ -128,7 +119,7 @@ class TestModel():
         gif = animation.FuncAnimation(fig, animate, frames = len(steps), interval=50)
         gif.save(filename, writer='imagemagick', fps=60)
 
-    def run_episode(self, episode, scores, eps_history, loss_history, metrics_values):
+    def run_episode(self, episode, metrics_values):
         metrics = Metrics(self.num_agents, self.visual_radius)
         score = 0
         done = [False]
@@ -136,18 +127,17 @@ class TestModel():
         losses = []
         step = 0
         steps = []
-        while not done[0] and step < 2000:
+        while not done[0] and step < 1000:
             actions = self.choose_actions(observations) 
-            
             new_observations, rewards, done, info = self.env.step(actions)
             metrics.add_step(new_observations, rewards)
-            score += rewards[0]
-
+            score += sum(rewards)
             losses = self.train_agents(observations, losses, new_observations, actions, rewards, done)
 
             observations = new_observations
             step += 1
-            steps.append(self.env.render())
+            if episode == 1 or episode % 100 == 0:
+                steps.append(self.env.render())
             
         for agent in self.agents:
             agent.decay_epsilon()
@@ -155,18 +145,13 @@ class TestModel():
         # Save scores
         metrics.calculate_metrics()
         metrics_values.append(metrics)
-        scores.append(score)
-        eps_history.append(self.agents[0].epsilon)
-        loss_history.append(np.array(losses).mean())
 
-        avg_score = np.mean(scores[-100:])
-
-        if episode in [1, 1000, 1500, self.num_episodes]:
+        if episode == 1 or episode % 100 == 0:
             thread = threading.Thread(target=self.store_episode, args=(episode, steps))
             thread.start()
 
-        print('Episode {} Score: {:.2f} Average Score: {:.2f} Epsilon {:.2f}'.format(episode, scores[-1], avg_score, self.agents[0].epsilon))
+        print('Episode {} Total Score: {:.2f}, Epsilon {:.2f}'.format(episode, score, self.agents[0].epsilon))
         
         if episode % 5 == 0:
-            Metrics.save_as_csv(metrics_values, self.map)
+            Metrics.save_as_csv(metrics_values, self.map, self.action_policy)
         

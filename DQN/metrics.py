@@ -65,7 +65,7 @@ class Metrics:
         self.observations = []
         self.rewards = []
 
-    def plot(metrics_values, num_episodes, map): 
+    def plot(metrics_values, num_episodes, map, action_policy): 
         fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
 
         if not isinstance(metrics_values, list):
@@ -103,14 +103,14 @@ class Metrics:
             ax[i].yaxis.grid(linestyle='--')
 
         fig.tight_layout()
-        fig.savefig(FILE_PATHS[map] + 'metrics.png')
+        fig.savefig(FILE_PATHS[map] + action_policy + '/metrics.png')
         print("Plotted metrics!")
     
-    def save_as_csv(metrics_values, map):
+    def save_as_csv(metrics_values, map, action_policy):
         if not isinstance(metrics_values, list):
             metrics_values = [metrics_values]
 
-        filename = FILE_PATHS[map] + "metrics.csv"
+        filename = FILE_PATHS[map] + action_policy + "/metrics.csv"
 
         efficiency = [m.efficiency for m in metrics_values]
         equality = [m.equality for m in metrics_values]

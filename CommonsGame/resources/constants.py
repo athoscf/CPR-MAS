@@ -51,15 +51,16 @@ class GiftRange:
     HEIGHT = 5
     
 class ActionPolicies:
-    MIXED = 0
-    TAG_ONLY = 1
-    GIFT_ONLY = 2
-    TAG_AND_GIFT = 3
-    DEFAULT = 4
+    MIXED = "mixed"
+    TAG_ONLY = "tag_only"
+    GIFT_ONLY = "gift_only"
+    TAG_AND_GIFT = "tag_and_gift"
+    DEFAULT = "default"
     
 FILE_PATHS = {
-    SmallMap : "results/small_map/",
-    OpenMap : "results/open_map/",
+    SmallMap: "results/small_map/",
+    OpenMap : "results/open_map/" ,
+    OpenMapV2 : "results/open_map_v2/" ,
     SingleEntranceMap: "results/single_entrance_map/",
     MultipleEntranceMap: "results/multiple_entrance_map/",
     RegionMap:"results/region_map/"

@@ -27,6 +27,22 @@ class OpenMap:
         list('             @                          '),
     ]
     
+class OpenMapV2:
+    num_agents = 6
+    agent_chars = "ABCDEF"
+    map = [
+        list('       @  @@@ @      @@@  @ @    '),
+        list('      @@@  @ @@@                 '),
+        list(' @@    @      @        @@@  @    '),
+        list('           @                     '),
+        list('     @  @ @@@    @ @@@ @         '),
+        list(' @     @@@ @    @@@ @ @    A     '),
+        list('        @           @      B  C  '),
+        list('@@@ @ @  @@@       @@@  @  D     '),
+        list(' @ @  @@@  @        @       E    '),
+        list('      @      @    @@@        F   '),
+    ]
+    
 class SingleEntranceMap:
     num_agents = 6
     agent_chars = "ABCDEF"

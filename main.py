@@ -8,8 +8,8 @@ def main():
     # original_small_map = TestModel(num_episodes=15, map=SmallMap, visual_radius=5, warmup_steps=1000, csv_filename="small_map_result.csv")
     # original_small_map.execute()
     
-    original_open_map = TestModel(num_episodes=1500, map=OpenMap, visual_radius=5, warmup_episodes=10)
-    original_open_map.execute()
+    game = TestModel(map=OpenMapV2, action_policy=ActionPolicies.MIXED, num_episodes=5, visual_radius=5, warmup_steps=5000)
+    game.execute()
     
     # # New added maps with walls
     # single_entrance_map = TestModel(num_episodes=15, map=SingleEntranceMap, visual_radius=5, warmup_steps=1000, csv_filename="single_entrance_map_result.csv")
