@@ -111,7 +111,7 @@ class TestModel():
         done = [False]
         step = 0
         observations = self.env.reset()
-        while not done[0] and step < self.warmup_steps:
+        while step < self.warmup_steps:
             actions = self.choose_random_actions(observations)
             observations_, rewards, done, info = self.env.step(actions)
             self.store_transitions(observations, observations_, actions, rewards, done)
@@ -189,7 +189,7 @@ class TestModel():
         for agent in self.agents:    
             agent.scores[episode] = 0
             
-        while not done[0] and step < 1000:
+        while step < 1000:
             actions = self.choose_actions(observations) 
             new_observations, rewards, done, info = self.env.step(actions)
             metrics.add_step(new_observations, rewards,actions)
