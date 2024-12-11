@@ -64,7 +64,6 @@ class Metrics:
         actions = len(self.actions)
         gift_actions = 0
         for action_step in self.actions:
-            print(action_step)
             gift_actions += sum([1 for action in action_step if action == 8])
         total_actions = actions * self.num_agents
         self.coop = (total_actions - gift_actions) / actions
