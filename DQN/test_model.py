@@ -1,6 +1,5 @@
 import gym
 import numpy as np
-import random
 import threading
 import matplotlib
 from matplotlib import animation
@@ -29,12 +28,11 @@ class TestModel():
 
     def execute(self):
         self.warmup_replay_buffer()
-
         metrics_values = []
         for episode in range(1, self.num_episodes + 1):
             self.run_episode(episode, metrics_values)
-            
-        Metrics.plot(metrics_values, self.num_episodes, self.map, self.action_policy)
+            if episode % 100 == 0: 
+                Metrics.plot(metrics_values, episode, self.map, self.action_policy)
         
     def create_agents(self, action_policy):
         # create csv file for agents' metrics
