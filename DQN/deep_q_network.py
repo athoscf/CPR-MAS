@@ -3,30 +3,44 @@ import torch.nn as nn
 import torch.nn.functional as func
 
 class DeepQNetwork(nn.Module):
-    def __init__(self, input_dims, n_actions):
-      super(DeepQNetwork, self).__init__()
+    def __init__(self, input_shape, n_actions):
+        super(DeepQNetwork, self).__init__()
 
-      self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-      
-      self.input_dims = input_dims
-      self.n_actions = n_actions
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        self.input_shape = input_shape # Shape of the input, e.g., (3, 64, 64)
+        self.n_actions = n_actions
 
-      self.conv1 = nn.Conv2d(in_channels=input_dims[2], out_channels=32, kernel_size=3, stride=3)
-      self.conv2 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=2, stride=2)
-      self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=1, stride=1)
-      self.fc1 = nn.Linear(64, 64)
-      self.Q_network = nn.Linear(64, n_actions)
+        # Dynamically calculate the input size for the first linear layer
+        sample_input = torch.zeros(self.input_shape)  # Create a dummy tensor with input shape
+        input_size = self.calculate_input_size(sample_input)
 
-      self.to(self.device)
+        # Define fully connected layers
+        self.fc1 = nn.Linear(input_size, 32)  # First hidden layer with 32 units
+        self.fc2 = nn.Linear(32, 32)         # Second hidden layer with 32 units
+        self.output = nn.Linear(32, n_actions)  # Output layer with 8 units (n_actions)
+
+        self.to(self.device)
 
     def forward(self, s):
-        s = s.permute(0, 3, 1, 2)
-        features = func.relu(self.conv1(s))
-        features = func.relu(self.conv2(features))
-        features = func.relu(self.conv3(features))
-        features = torch.flatten(features, 1)
-        features = func.relu(self.fc1(features))
-        return self.Q_network(features)
+        # Flatten the input tensor from (batch_size, channels, height, width) to (batch_size, -1)
+        x = torch.flatten(s, start_dim=1)  
+        x = func.relu(self.fc1(x))  # First hidden layer with ReLU activation
+        x = func.relu(self.fc2(x)) # Second hidden layer with ReLU activation
+        return self.output(x)      # Output layer
+
+    @staticmethod
+    def calculate_input_size(sample_input):
+        """
+        Calculate the flattened size of the input for linear layers.
+        
+        Args:
+            sample_input (torch.Tensor): A sample input tensor with shape 
+                                         (channels, height, width).
+        
+        Returns:
+            int: Flattened size of the input tensor.
+        """
+        return torch.flatten(sample_input, start_dim=0).shape[0]
 
     def init_weights(self):
         def init_layer_weights(m):

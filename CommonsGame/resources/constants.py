@@ -59,11 +59,7 @@ class ActionPolicies:
     
 FILE_PATHS = {
     SmallMap: "results/small_map/",
-    OpenMap : "results/open_map/" ,
-    OpenMapV2 : "results/open_map_v2/" ,
-    SingleEntranceMap: "results/single_entrance_map/",
-    MultipleEntranceMap: "results/multiple_entrance_map/",
-    RegionMap:"results/region_map/"
+    SmallMapWalls: "results/small_map_walls/"
 }      
     
 DEFAULT_COLOURS = [

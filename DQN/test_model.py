@@ -37,16 +37,74 @@ class TestModel():
         Metrics.plot(metrics_values, self.num_episodes, self.map, self.action_policy)
         
     def create_agents(self, action_policy):
+        # create csv file for agents' metrics
+        self.agent_filename = FILE_PATHS[self.map] + self.action_policy + f"/agent_metrics"
+        
         if action_policy == ActionPolicies.TAG_AND_GIFT:
-            return [Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=True) for _ in range(self.num_agents)]
+            agent_list = []
+            rows = ""
+            for i in range(self.num_agents):
+                rows += f"agent{i+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=True)
+                agent_list.append(agent)
+            self.agent_filename += "_tag_and_gift.csv"
+            # create csv file
+            with open(self.agent_filename, "w") as f:
+                f.write("episode," + rows + "\n")
+            return agent_list
         elif action_policy == ActionPolicies.TAG_ONLY:
-            return [Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=False) for _ in range(self.num_agents)]
+            agent_list = []
+            rows = ""
+            for i in range(self.num_agents):
+                rows += f"agent{i+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=False)
+                agent_list.append(agent)
+            self.agent_filename += "_tag_only.csv"
+            # create csv file
+            with open(self.agent_filename, "w") as f:
+                f.write("episode," + rows + "\n")
+            return agent_list
         elif action_policy == ActionPolicies.GIFT_ONLY:
-            return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=True) for _ in range(self.num_agents)]
+            agent_list = []
+            rows = ""
+            for i in range(self.num_agents):
+                rows += f"agent{i+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=True)
+                agent_list.append(agent)
+            self.agent_filename += "_gift_only.csv"
+            # create csv file
+            with open(self.agent_filename, "w") as f:
+                f.write("episode," + rows + "\n")
+            return agent_list
         elif action_policy == ActionPolicies.MIXED:
-            return [Agent(input_dims=self.input_dims, tag_enabled=random.choice([True, False]), gift_enabled=random.choice([True, False])) for _ in range(self.num_agents)] 
+            agent_list = []
+            rows = ""
+            half = self.num_agents//2
+            for i in range(half):
+                rows += f"gift_agent{i+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=True)
+                agent_list.append(agent)
+            for i in range(half):
+                rows += f"tag_agent{i+half+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=True, gift_enabled=False)
+                agent_list.append(agent)
+            self.agent_filename += "_mixed.csv"
+            # create csv file
+            with open(self.agent_filename, "w") as f:
+                f.write("episode," + rows + "\n")
+            return agent_list 
         elif action_policy == ActionPolicies.DEFAULT:
-            return [Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=False) for _ in range(self.num_agents)]
+            agent_list = []
+            rows = ""
+            for i in range(self.num_agents):
+                rows += f"agent{i+1},"
+                agent = Agent(input_dims=self.input_dims, tag_enabled=False, gift_enabled=False)
+                agent_list.append(agent)
+            self.agent_filename += "_default.csv"
+            # create csv file
+            with open(self.agent_filename, "w") as f:
+                f.write("episode," + rows + "\n")
+            return agent_list
         
     def warmup_replay_buffer(self):
         print("Warming up replay buffer")
@@ -127,10 +185,19 @@ class TestModel():
         losses = []
         step = 0
         steps = []
+        # make agent dictionary to store scores for each episode
+        for agent in self.agents:    
+            agent.scores[episode] = 0
+            
         while not done[0] and step < 1000:
             actions = self.choose_actions(observations) 
             new_observations, rewards, done, info = self.env.step(actions)
             metrics.add_step(new_observations, rewards,actions)
+            
+            # add rewards to each agent
+            for i, agent in enumerate(self.agents):
+                agent.scores[episode] += rewards[i]
+            
             score += sum(rewards)
             losses = self.train_agents(observations, losses, new_observations, actions, rewards, done)
 
@@ -145,6 +212,12 @@ class TestModel():
         # Save scores
         metrics.calculate_metrics()
         metrics_values.append(metrics)
+
+        with open(self.agent_filename, "a") as f:
+            f.write(f"{episode},")
+            for agent in self.agents:
+                f.write(f"{agent.scores[episode]},")
+            f.write("\n")
 
         if episode == 1 or episode % 100 == 0:
             thread = threading.Thread(target=self.store_episode, args=(episode, steps))

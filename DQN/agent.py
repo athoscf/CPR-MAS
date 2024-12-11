@@ -35,6 +35,9 @@ class Agent:
         self.epsilon = 1
         self.batch_size = 64
         
+        # make score dictionary to store scores for each episode
+        self.scores = {}
+        
         self.replay_buffer = ReplayBuffer()
 
     def e_greedy_policy(self, Qs):
