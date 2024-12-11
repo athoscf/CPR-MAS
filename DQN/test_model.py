@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 
 class TestModel():
     
-    def __init__(self, map=OpenMap, action_policy=ActionPolicies.MIXED, num_episodes=1501, visual_radius=5, warmup_steps=5000): 
+    def __init__(self, map=SmallMap, action_policy=ActionPolicies.TAG_AND_GIFT, num_episodes=10, visual_radius=5, warmup_steps=5000): 
         self.num_episodes = num_episodes
         self.num_agents = map.num_agents
         self.visual_radius = visual_radius
@@ -130,14 +130,14 @@ class TestModel():
         while not done[0] and step < 1000:
             actions = self.choose_actions(observations) 
             new_observations, rewards, done, info = self.env.step(actions)
-            metrics.add_step(new_observations, rewards)
+            metrics.add_step(new_observations, rewards,actions)
             score += sum(rewards)
             losses = self.train_agents(observations, losses, new_observations, actions, rewards, done)
 
             observations = new_observations
             step += 1
             if episode == 1 or episode % 100 == 0:
-                steps.append(self.env.render())
+                steps.append(self.env.render().copy())
             
         for agent in self.agents:
             agent.decay_epsilon()

@@ -44,7 +44,7 @@ class Sprites:
 
 class BeamRange:
     WIDTH = 2
-    HEIGHT = 10
+    HEIGHT = 5
     
 class GiftRange:
     WIDTH = 2

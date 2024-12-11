@@ -9,15 +9,19 @@ class Metrics:
         self.empty_board = np.zeros((2 * visual_radius + 1, 2 * visual_radius + 1, 3), dtype=np.float32)
         self.observations = []
         self.rewards = []
+        self.actions = []
 
         self.efficiency = None
         self.equality = None
         self.sustainability = None
         self.peace = None
+        self.coop = None
 
-    def add_step(self, observation, rewards):
+    def add_step(self, observation, rewards,actions):
         self.observations.append(observation)
         self.rewards.append(rewards)
+        self.actions.append(actions)
+
     
     def calculate_efficiency(self):
         self.efficiency = np.mean( [sum(sublist[i] for sublist in self.rewards) for i in range(len(self.rewards[0]))])
@@ -56,17 +60,28 @@ class Metrics:
         total_observations = steps * self.num_agents
         self.peace = (total_observations - tagged) / steps
 
+    def calculate_coop(self):
+        actions = len(self.actions)
+        gift_actions = 0
+        for action_step in self.actions:
+            print(action_step)
+            gift_actions += sum([1 for action in action_step if action == 8])
+        total_actions = actions * self.num_agents
+        self.coop = (total_actions - gift_actions) / actions
+
     def calculate_metrics(self):
         self.calculate_efficiency()
         self.calculate_equality()
         self.calculate_sustainability()
         self.calculate_peace()
+        self.calculate_coop()
 
         self.observations = []
         self.rewards = []
+        self.actions = []
 
     def plot(metrics_values, num_episodes, map, action_policy): 
-        fig, ax = plt.subplots(4, 1, sharex=True, figsize=(6, 10))
+        fig, ax = plt.subplots(5, 1, sharex=True, figsize=(8, 12))
 
         if not isinstance(metrics_values, list):
             metrics_values = [metrics_values]
@@ -75,13 +90,14 @@ class Metrics:
         equality = [m.equality for m in metrics_values]
         sustainability = [m.sustainability for m in metrics_values]
         peace = [m.peace for m in metrics_values]
-
+        coop = [m.coop for m in metrics_values]
+        
         x = np.arange(1, num_episodes + 1)  
 
         window_size = 100
         min_periods = 25
 
-        for i, metric in enumerate([efficiency, sustainability, equality, peace]):
+        for i, metric in enumerate([efficiency, sustainability, equality, peace, coop]):
             metric = np.array(metric)
             rolling_avg = np.array([
                 np.mean(metric[max(0, j - window_size + 1):j + 1])
@@ -97,9 +113,10 @@ class Metrics:
         ax[1].set_ylabel('Sustainability (S)', fontsize=14)
         ax[2].set_ylabel('Equality (E)', fontsize=14)
         ax[3].set_ylabel('Peacefulness (P)', fontsize=14)
-        ax[3].set_xlabel('Episode', fontsize=14)
+        ax[4].set_ylabel('Cooperation (C)', fontsize=14)
+        ax[4].set_xlabel('Episode', fontsize=14)
 
-        for i in range(4):
+        for i in range(5):
             ax[i].yaxis.grid(linestyle='--')
 
         fig.tight_layout()
@@ -116,6 +133,7 @@ class Metrics:
         equality = [m.equality for m in metrics_values]
         sustainability = [m.sustainability for m in metrics_values]
         peace = [m.peace for m in metrics_values]
+        coop = [m.coop for m in metrics_values]
 
         # Determine the last recorded episode
         last_recorded_episode = 0
@@ -130,11 +148,11 @@ class Metrics:
         with open(filename, "a") as file:
             # If the file is empty (or header is missing), write the header
             if os.path.getsize(filename) == 0:
-                file.write("episode,efficiency,equality,sustainability,peace\n")
+                file.write("episode,efficiency,equality,sustainability,peace,cooperability\n")
             
             # Append only new episodes
             for i, _ in enumerate(metrics_values):
                 episode_number = i + 1
                 if episode_number > last_recorded_episode:
-                    file.write(f"{episode_number},{efficiency[i]},{equality[i]},{sustainability[i]},{peace[i]}\n")
+                    file.write(f"{episode_number},{efficiency[i]},{equality[i]},{sustainability[i]},{peace[i]},{coop[i]}\n")
             
