@@ -10,3 +10,5 @@ To install `cd` to the directory of the repository and run `pip install -e .`
 
 The file `main.py` contains a simple usage example where you can modify the map config, the size of its field of vision, the number of episodes and the action policy. To run the file `cd` to the directory of the repository and run `python main.py`.
 
+The current version includes the results, it may be necessary to remove the `metrics.csv` files and also create the result folders of the correspondent maps and methods to avoid errors.
+
