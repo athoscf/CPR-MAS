@@ -58,15 +58,14 @@ class Metrics:
             tagged += sum([1 for obs in observation_step if np.array_equal(obs, self.empty_board)])
 
         total_observations = steps * self.num_agents
-        self.peace = (total_observations - tagged) / steps
+        self.peace = (total_observations - tagged) / self.num_agents
 
     def calculate_coop(self):
         actions = len(self.actions)
         gift_actions = 0
         for action_step in self.actions:
-            gift_actions += sum([1 for action in action_step if action == 8])
-        total_actions = actions * self.num_agents
-        self.coop = (total_actions - gift_actions) / actions
+            gift_actions += sum([1 for action in action_step if action == Actions.GIFT])
+        self.coop = gift_actions / (actions*self.num_agents)
 
     def calculate_metrics(self):
         self.calculate_efficiency()
